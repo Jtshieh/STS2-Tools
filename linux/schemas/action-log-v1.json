@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "STS2 action log v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "rootRunId",
+    "processRunId",
+    "slAttempt",
+    "recovery",
+    "sequence",
+    "status",
+    "action",
+    "observation",
+    "error"
+  ],
+  "properties": {
+    "schema": {
+      "const": "sts2-action-log-v1"
+    },
+    "rootRunId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "processRunId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "slAttempt": {
+      "const": 0
+    },
+    "recovery": {
+      "type": "null"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "status": {
+      "enum": [
+        "initiated",
+        "accepted",
+        "delivered",
+        "completed",
+        "rejected",
+        "failed",
+        "interrupted"
+      ]
+    },
+    "action": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "observation": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "error": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "rejected",
+              "failed",
+              "interrupted"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "error": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "initiated",
+              "accepted",
+              "delivered",
+              "completed"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "action": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "completed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "observation": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  ]
+}

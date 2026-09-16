@@ -1,0 +1,18 @@
+name: source-and-contracts
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - run: python3 -B scripts/audit_source.py --staged
+      - run: python3 -B -m unittest discover -s mac/tests -v
+      - run: python3 -B -m unittest discover -s tests -v
+        working-directory: linux
+      - run: python3 -B scripts/package_source.py
+        working-directory: linux

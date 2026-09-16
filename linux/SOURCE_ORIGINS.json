@@ -1,0 +1,269 @@
+{
+  "schema": "sts2-source-origins-v1",
+  "scope": "Reviewed integration source under MIT; third-party notices retained. No game payload redistributed.",
+  "files": [
+    {
+      "path": ".gitignore",
+      "origin": "Project-authored release integration/configuration/documentation; MIT"
+    },
+    {
+      "path": "LICENSE",
+      "origin": "Project-authored release integration/configuration/documentation; MIT"
+    },
+    {
+      "path": "LICENSES/Godot.txt",
+      "origin": "Godot 4.5.1 MIT notice"
+    },
+    {
+      "path": "LICENSES/RunReplays.txt",
+      "origin": "Verbatim pinned upstream MIT license",
+      "sourceSha256BeforeReleaseEdits": "e059883c69ded53e80b9bebd4df8a6c4bf6420de580d80279b99a703086a8cf8"
+    },
+    {
+      "path": "LICENSES/divine-sts2.txt",
+      "origin": "Verbatim pinned upstream MIT license",
+      "sourceSha256BeforeReleaseEdits": "6bb34d33af8ceee84c46e50032ba42973c8f785761f50533c84428f8c198cbb5"
+    },
+    {
+      "path": "NOTICE.md",
+      "origin": "Project-authored release integration/configuration/documentation; MIT"
+    },
+    {
+      "path": "PROTOCOL.md",
+      "origin": "Project-authored release integration/configuration/documentation; MIT"
+    },
+    {
+      "path": "README.md",
+      "origin": "Project-authored release integration/configuration/documentation; MIT"
+    },
+    {
+      "path": "RELEASE.md",
+      "origin": "Project-authored release integration/configuration/documentation; MIT"
+    },
+    {
+      "path": "RELEASE_FILES.txt",
+      "origin": "Explicit public file allowlist; MIT"
+    },
+    {
+      "path": "SOURCE_ORIGINS.json",
+      "origin": "Project-authored source attribution ledger; MIT"
+    },
+    {
+      "path": "VERSION",
+      "origin": "Project-authored release integration/configuration/documentation; MIT"
+    },
+    {
+      "path": "config/game-linux.json",
+      "origin": "Project-authored release integration/configuration/documentation; MIT"
+    },
+    {
+      "path": "config/userland-archives.json",
+      "origin": "Official public Ubuntu archive URLs/checksums; no package contents",
+      "sourceSha256BeforeReleaseEdits": "4750928de056148298e0f1010c347a6a2e85ab58f89d47194ee6b4f944cdbb7d"
+    },
+    {
+      "path": "schemas/action-log-v1.json",
+      "origin": "Project-authored release integration/configuration/documentation; MIT"
+    },
+    {
+      "path": "scripts/build.py",
+      "origin": "Project-authored release integration/configuration/documentation; MIT"
+    },
+    {
+      "path": "scripts/build_private_userland.py",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "e95237321ba66d424a062e06e9f7b12376b1194c97302bce5e106296d98576da"
+    },
+    {
+      "path": "scripts/compare_gui.py",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "3b66c4afb7f74f13ba556a02f49f33381abcd407527ad953831d66cadd0a7204"
+    },
+    {
+      "path": "scripts/export_log.py",
+      "origin": "Project-authored release integration/configuration/documentation; MIT"
+    },
+    {
+      "path": "scripts/import_trace.py",
+      "origin": "Project-authored release integration/configuration/documentation; MIT"
+    },
+    {
+      "path": "scripts/package_source.py",
+      "origin": "Project-authored release integration/configuration/documentation; MIT"
+    },
+    {
+      "path": "scripts/pe_metadata.py",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "678b4ce594f114287c74fde649080e853aabb7a9e6d13c300d2e265c72d4a32e"
+    },
+    {
+      "path": "scripts/prepare.py",
+      "origin": "Project-authored release integration/configuration/documentation; MIT"
+    },
+    {
+      "path": "scripts/protocol.py",
+      "origin": "Project-authored release integration/configuration/documentation; MIT"
+    },
+    {
+      "path": "scripts/runtime.py",
+      "origin": "Project-authored release integration/configuration/documentation; MIT"
+    },
+    {
+      "path": "scripts/sts2_play.py",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "7369557092a44a820ddf9ecd74efd172c6e3299e69808df4a61ce14f4ce70c5a"
+    },
+    {
+      "path": "scripts/sts2_policy.py",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "7384550a52bbbfd72edbe780594846f35624cedc1c75ae0ec649ae7da9e4859a"
+    },
+    {
+      "path": "scripts/sts2_small_policy.py",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "807a14abf33afd60e89c4eee53a279064f535b7b9821bfedbaecc771013c8bcf"
+    },
+    {
+      "path": "scripts/sts2_train.py",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "4f691880bcf4ce57bc8f82a81b102f1c1d6f1c170586e25c61c762a0fc2a5d20"
+    },
+    {
+      "path": "scripts/work_materials.py",
+      "origin": "Project-authored bounded work-material reclamation and synthetic safety tests; MIT"
+    },
+    {
+      "path": "src/guard/accepted_filter.h",
+      "origin": "Project-authored native syscall isolation; no game method bodies",
+      "sourceSha256BeforeReleaseEdits": "c9395e4fde53d4991e205171ce999d26f597ab0938d16ee861abe5d896f84ebd"
+    },
+    {
+      "path": "src/guard/e004b_common.h",
+      "origin": "Project-authored native syscall isolation; no game method bodies",
+      "sourceSha256BeforeReleaseEdits": "d3831ff712883d009acbf4b89ce61592d945753722f6b687ab12b3015d4bc627"
+    },
+    {
+      "path": "src/guard/early_guard.c",
+      "origin": "Project-authored native syscall isolation; no game method bodies",
+      "sourceSha256BeforeReleaseEdits": "4dec0334aaaff8685baecbc2015c245f830669f5e14ff43a794fad91051ef718"
+    },
+    {
+      "path": "src/host/Actions.cs",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "1cf10fa5de01c4cac8092ec6c652a3c17c91cae3cc28337b4f467c3c47e0f6eb"
+    },
+    {
+      "path": "src/host/Bridge.cs",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "debe3edc7fd85ad7993e3854bf83bb3325dc28e592fd6c23029ce4847f13daa3"
+    },
+    {
+      "path": "src/host/EarlyGuardMarker.cs",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "d471f71cf69d734f8adafe2f4f42ff07815b32579e05348a5d918fec8a7c963c"
+    },
+    {
+      "path": "src/host/GodotPluginsInitializer.cs",
+      "origin": "Godot SDK initializer structure with project-authored guarded bootstrap; preserve Godot MIT",
+      "sourceSha256BeforeReleaseEdits": "977728650c2b690288e68b3d360dda6544cce4f2c2b4bda87576e556ea99df6b"
+    },
+    {
+      "path": "src/host/HostControlSuite.cs",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "b2b72374e246935155f9e36afcede11e8e6694789fdc4064263784e534d92db5"
+    },
+    {
+      "path": "src/host/HostControls.csproj",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "b63c81497be3cf6f6ea8f047e20f65fbac39dc50642ad8cd769b75dc80d9e82d"
+    },
+    {
+      "path": "src/host/LinuxSeccompGuard.cs",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "56da6a5cf6ec73b05d6f0a4a8416edc70882d0dd8d0b03275c5cdba64d5a2bd9"
+    },
+    {
+      "path": "src/host/Main.cs",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "89ca1583b9f0d462d4d412d5e101560867c6e6f83b4a716b2fb600bb1dca6b0e"
+    },
+    {
+      "path": "src/host/Main.tscn",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "17e000774894d2c1da43fb53996b1721542fc6342465f9de46f48a536abca26a"
+    },
+    {
+      "path": "src/host/ManagedBootstrap.cs",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "fd2779566e85e0b35b94cb55a5e3cd23629055d7bee680688a124ca790750920"
+    },
+    {
+      "path": "src/host/NormalBootConfig.cs",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "95f5d7267a74896c0b69d086e79d2c0fd9ce2c7b8855d3a2b608ccc7eb2dec36"
+    },
+    {
+      "path": "src/host/NormalBootLogs.cs",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "05a07ec4a9406eef6ac1a3dc59f01c06a651824bcfd745b5c50438c86d7b6866"
+    },
+    {
+      "path": "src/host/NormalGameLoader.cs",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "5e055e4d1515814a475f54fed67deaac36af4c36591df0b8f94733c0366895d3"
+    },
+    {
+      "path": "src/host/NormalGameRead.cs",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "8819106991907e3494a9819461b628907c5100f251595459c45a6badc0eeed00"
+    },
+    {
+      "path": "src/host/ProjectSettingsContract.cs",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "e59b23e0de62f751fd46bb1110896ed4cfc7d589bc44b04240e3574871e894bc"
+    },
+    {
+      "path": "src/host/ReleaseHostIdentity.cs",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "0634105d12e03feab5ca1ab70fff79e6f505b65c43169ab2e0bb27919db4f0bc"
+    },
+    {
+      "path": "src/host/global.json",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "ced7defaff3cb85a3aed1f752da17ac4194123de1a3e02e1c93bcdb580d4f873"
+    },
+    {
+      "path": "src/host/hq_elf.py",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "bab541bf6de0a72727b5b82a668d8aeab4b3db7d475c1db0c14222dcf4420442"
+    },
+    {
+      "path": "src/host/normal_boot_inputs.py",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "35f32a350771bb2e84b923f71fb76fc13198c5674feae4ae0db6e033672d4d08"
+    },
+    {
+      "path": "src/host/prepare_release_elf.py",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "2f929854e66493d2168b81b682df955fa4df7aed93c4b182aa9313ed59c7eab0"
+    },
+    {
+      "path": "src/host/project.godot",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "736f54540549e8bb0fc07d8da325aaeecae79a9f4980eecfb12cd80f9c329498"
+    },
+    {
+      "path": "src/host/run-normal-boot.py",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "sourceSha256BeforeReleaseEdits": "d705bcf5a678b0f75baf404b98c8717df636be106f81e54cd32428f4fa2158d6"
+    },
+    {
+      "path": "tests/test_contracts.py",
+      "origin": "Project-authored release integration/configuration/documentation; MIT"
+    },
+    {
+      "path": "tests/test_work_materials.py",
+      "origin": "Project-authored bounded work-material reclamation and synthetic safety tests; MIT"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+.private/
+__pycache__/
+*.pyc
+.godot/
+bin/
+obj/
+*.save
+*.dll
+*.so
+*.pck
+*.log
+*.zip
+*.tar*

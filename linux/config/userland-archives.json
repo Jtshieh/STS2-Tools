@@ -1,0 +1,150 @@
+{
+  "archives": [
+    {
+      "path": "ubuntu-base-22.04.5-base-amd64.tar.gz",
+      "package": "ubuntu-base",
+      "version": "22.04.5",
+      "bytes": 29832285,
+      "sha256": "242cd8898b33ea806ef5f13b1076ed7c76f9f989d18384452f7166692438ff1a",
+      "url": "https://cdimage.ubuntu.com/ubuntu-base/releases/22.04/release/ubuntu-base-22.04.5-base-amd64.tar.gz"
+    },
+    {
+      "path": "fontconfig-config_2.13.1-4.2ubuntu5_all.deb",
+      "package": "fontconfig-config",
+      "version": "2.13.1-4.2ubuntu5",
+      "bytes": 29096,
+      "sha256": "c40405fa036d1732e269fabd4c5b40076b973a226da1df6921d4b7e7a1e2ff72",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/f/fontconfig/fontconfig-config_2.13.1-4.2ubuntu5_all.deb"
+    },
+    {
+      "path": "fonts-dejavu-core_2.37-2build1_all.deb",
+      "package": "fonts-dejavu-core",
+      "version": "2.37-2build1",
+      "bytes": 1041300,
+      "sha256": "c33fe8bf33b50d99d6448804a090123b1bbba37d7a8703c630695676d110a47d",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/f/fonts-dejavu/fonts-dejavu-core_2.37-2build1_all.deb"
+    },
+    {
+      "path": "libbrotli1_1.0.9-2build6_amd64.deb",
+      "package": "libbrotli1",
+      "version": "1.0.9-2build6",
+      "bytes": 315164,
+      "sha256": "8e6aa2dfd44df287b9fb227862f3b6062ec074dd39a247874edfe12e1dcc3841",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/b/brotli/libbrotli1_1.0.9-2build6_amd64.deb"
+    },
+    {
+      "path": "libcurl4_7.81.0-1ubuntu1.27_amd64.deb",
+      "package": "libcurl4",
+      "version": "7.81.0-1ubuntu1.27",
+      "bytes": 291746,
+      "sha256": "da283ae12304da05c2b90b51ec6e1715554dc54d9d4f46318103ff0f14beba5d",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/c/curl/libcurl4_7.81.0-1ubuntu1.27_amd64.deb"
+    },
+    {
+      "path": "libexpat1_2.4.7-1ubuntu0.7_amd64.deb",
+      "package": "libexpat1",
+      "version": "2.4.7-1ubuntu0.7",
+      "bytes": 92136,
+      "sha256": "a538ba8ea04ac4011337e99f77a8f3387ddef2909b8a83a58d9662d8715df4cd",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/e/expat/libexpat1_2.4.7-1ubuntu0.7_amd64.deb"
+    },
+    {
+      "path": "libfontconfig1_2.13.1-4.2ubuntu5_amd64.deb",
+      "package": "libfontconfig1",
+      "version": "2.13.1-4.2ubuntu5",
+      "bytes": 131434,
+      "sha256": "6be0c141aed23d9eb801658d248fd667bea2b8a9ccab4db7b596a69ffe3393fd",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/f/fontconfig/libfontconfig1_2.13.1-4.2ubuntu5_amd64.deb"
+    },
+    {
+      "path": "libfreetype6_2.11.1+dfsg-1ubuntu0.3_amd64.deb",
+      "package": "libfreetype6",
+      "version": "2.11.1+dfsg-1ubuntu0.3",
+      "bytes": 388176,
+      "sha256": "729f5a3a72069ddcef6a54f6825178667477625574925504594769665897afbc",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/f/freetype/libfreetype6_2.11.1+dfsg-1ubuntu0.3_amd64.deb"
+    },
+    {
+      "path": "libicu70_70.1-2_amd64.deb",
+      "package": "libicu70",
+      "version": "70.1-2",
+      "bytes": 10581942,
+      "sha256": "58a154f6307289813da2276f900498ef536ae7c0522d2cf31a3c3c5cf62dfd9a",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/i/icu/libicu70_70.1-2_amd64.deb"
+    },
+    {
+      "path": "libldap-2.5-0_2.5.20+dfsg-0ubuntu0.22.04.1_amd64.deb",
+      "package": "libldap-2.5-0",
+      "version": "2.5.20+dfsg-0ubuntu0.22.04.1",
+      "bytes": 183948,
+      "sha256": "a3ee4ac116a2c50c9ddfe9de91c0781a50704244771474334340cdce02f5cd4f",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/o/openldap/libldap-2.5-0_2.5.20+dfsg-0ubuntu0.22.04.1_amd64.deb"
+    },
+    {
+      "path": "libnghttp2-14_1.43.0-1ubuntu0.4_amd64.deb",
+      "package": "libnghttp2-14",
+      "version": "1.43.0-1ubuntu0.4",
+      "bytes": 76932,
+      "sha256": "6e968d1ed7abb3635a3b0707ebfa20cd368ce784f83cc567b11c0723217a6de4",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/n/nghttp2/libnghttp2-14_1.43.0-1ubuntu0.4_amd64.deb"
+    },
+    {
+      "path": "libpng16-16_1.6.37-3ubuntu0.6_amd64.deb",
+      "package": "libpng16-16",
+      "version": "1.6.37-3ubuntu0.6",
+      "bytes": 192320,
+      "sha256": "c50e4291d15bbe3489245f773ad1d2cdb63b1753a1382a393ad34ce1b8d70358",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/libp/libpng1.6/libpng16-16_1.6.37-3ubuntu0.6_amd64.deb"
+    },
+    {
+      "path": "libpsl5_0.21.0-1.2build2_amd64.deb",
+      "package": "libpsl5",
+      "version": "0.21.0-1.2build2",
+      "bytes": 58388,
+      "sha256": "cd29dee0eac2bdf3f944f47b3926993827dc6b3710251df76006fab2fd09f7e1",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/libp/libpsl/libpsl5_0.21.0-1.2build2_amd64.deb"
+    },
+    {
+      "path": "librtmp1_2.4+20151223.gitfa8646d.1-2build4_amd64.deb",
+      "package": "librtmp1",
+      "version": "2.4+20151223.gitfa8646d.1-2build4",
+      "bytes": 58190,
+      "sha256": "c8bdaa1e777d08888914e922f8f76441c26ee36438d3aa59161ecccc2421f77e",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/r/rtmpdump/librtmp1_2.4+20151223.gitfa8646d.1-2build4_amd64.deb"
+    },
+    {
+      "path": "libsasl2-2_2.1.27+dfsg2-3ubuntu1.2_amd64.deb",
+      "package": "libsasl2-2",
+      "version": "2.1.27+dfsg2-3ubuntu1.2",
+      "bytes": 53832,
+      "sha256": "391cb48d7e601d5bb590da8d426750acf6c987241ba280a36227873b94f20cee",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/c/cyrus-sasl2/libsasl2-2_2.1.27+dfsg2-3ubuntu1.2_amd64.deb"
+    },
+    {
+      "path": "libsasl2-modules-db_2.1.27+dfsg2-3ubuntu1.2_amd64.deb",
+      "package": "libsasl2-modules-db",
+      "version": "2.1.27+dfsg2-3ubuntu1.2",
+      "bytes": 20476,
+      "sha256": "0e222c26d70c2cfd132c8de035bcf9673067b6cbfea0a7421dced7b6256ae774",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/c/cyrus-sasl2/libsasl2-modules-db_2.1.27+dfsg2-3ubuntu1.2_amd64.deb"
+    },
+    {
+      "path": "libssh-4_0.9.6-2ubuntu0.22.04.8_amd64.deb",
+      "package": "libssh-4",
+      "version": "0.9.6-2ubuntu0.22.04.8",
+      "bytes": 188616,
+      "sha256": "ebeff6b7c3777c5ae0a2fd4200c3a946f3e866d102d7c56d46c997af8ebc2138",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/libs/libssh/libssh-4_0.9.6-2ubuntu0.22.04.8_amd64.deb"
+    },
+    {
+      "path": "ucf_3.0043_all.deb",
+      "package": "ucf",
+      "version": "3.0043",
+      "bytes": 56080,
+      "sha256": "a3fad168a58304fa4c9838158440660419a584855e2b2b881f980287c31a4819",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/u/ucf/ucf_3.0043_all.deb"
+    }
+  ],
+  "basePackageUpgrades": false,
+  "requiredPackageProposalSha256": "f821996a3f96f3588296e4dc3a80b71bc85c032263f9988b2dc0313321108490"
+}

@@ -1,0 +1,211 @@
+{
+  "release": "v0.111.0",
+  "commit": "41cef1ea",
+  "sourceBuild": "24724944",
+  "files": [
+    {
+      "bytes": 940520,
+      "path": "crashpad_handler",
+      "sha1": "057ab23f2f91dc41dbdd1cec2df6df13342dce14",
+      "sha256": "91e48061c8cf779c32421518f8ef2fd42fb2ecd75a706f7215de4cb9f0d6a9e9"
+    },
+    {
+      "bytes": 2328064,
+      "path": "data_sts2_linuxbsd_x86_64/0Harmony.dll",
+      "sha1": "2dcb9bffae3f704246891e8fcff702073fbab9f0",
+      "sha256": "ef1898322c9f5c86dc1b0758b272a9c440823b4a41ca9a0b82a3aa6b3d206387"
+    },
+    {
+      "bytes": 5613568,
+      "path": "data_sts2_linuxbsd_x86_64/GodotSharp.dll",
+      "sha1": "6594b7f2f3e0e503009996c243fc83ac23dc0e86",
+      "sha256": "0e4897ecdfb31456a97c7d8028dfb8d7dbdc632e2f73fc9b438d7b266a139289"
+    },
+    {
+      "bytes": 109056,
+      "path": "data_sts2_linuxbsd_x86_64/JetBrains.Annotations.dll",
+      "sha1": "771b8122084a6b7e1d22f9419e86610a8290ac12",
+      "sha256": "5f2b1475a7d80033a1ad25ea2710bd4b5fed40c28316cb0439bfb9aada2ef86b"
+    },
+    {
+      "bytes": 384800,
+      "path": "data_sts2_linuxbsd_x86_64/libsteam_api.so",
+      "sha1": "2ef44320d6d22c8e64c79b0ab02f6dedd2aa302c",
+      "sha256": "0ed3199107e021fa27e19a642148514ca5337563569c48fc094c27f907dd47a7"
+    },
+    {
+      "bytes": 27648,
+      "path": "data_sts2_linuxbsd_x86_64/MonoMod.Backports.dll",
+      "sha1": "d9290e2b66de1d5fe0796f2b5c9af1347206e589",
+      "sha256": "ac3f32bfd44aab83abf71abdff6dde548d57b7c0f8a1fe6d8964e348b4eeafb1"
+    },
+    {
+      "bytes": 4096,
+      "path": "data_sts2_linuxbsd_x86_64/MonoMod.ILHelpers.dll",
+      "sha1": "5561426b3d2bf6c5665a92e11754b002b95c9460",
+      "sha256": "fdd0e3538340fd78b8f521e62b8cac1ebb7683ac1f27f6aaedfc1044b14bf4bb"
+    },
+    {
+      "bytes": 831488,
+      "path": "data_sts2_linuxbsd_x86_64/Sentry.dll",
+      "sha1": "5405a5deffdfce13d575e108f7e1acacaba0a450",
+      "sha256": "4f1619b048d0b0f604265075bc5311f9f2e4a0ecdc09662009b7ee11d50c216c"
+    },
+    {
+      "bytes": 59392,
+      "path": "data_sts2_linuxbsd_x86_64/Sentry.Godot.dll",
+      "sha1": "e165707a615654754b0a86ad9d49d3327e3eb5e6",
+      "sha256": "bef522b322662f6dbf280891e23e2001483107f8bb981f1692c264928753112a"
+    },
+    {
+      "bytes": 168960,
+      "path": "data_sts2_linuxbsd_x86_64/SharpGen.Runtime.COM.dll",
+      "sha1": "1d1413763eabd9ae0bfb5a883b2ea89162419972",
+      "sha256": "2686187b458aba592e845d8c47f28c730efcca23eae77e3950a5178a9846d9ba"
+    },
+    {
+      "bytes": 79872,
+      "path": "data_sts2_linuxbsd_x86_64/SharpGen.Runtime.dll",
+      "sha1": "787d71584f96ac04ab72451800c07f21f5387528",
+      "sha256": "0e6acd59ab2173a6467626d69cf9f5b5b7651111ffee6e30fb7818de59335b4b"
+    },
+    {
+      "bytes": 142848,
+      "path": "data_sts2_linuxbsd_x86_64/SmartFormat.dll",
+      "sha1": "14a927c8c8b1a7d1174338585a3ccb4ad25f979a",
+      "sha256": "6220cde1dafffde5c51a4e23db4bb16e8ec620ef52bac51c0ad5f48c4769f168"
+    },
+    {
+      "bytes": 266752,
+      "path": "data_sts2_linuxbsd_x86_64/SmartFormat.ZString.dll",
+      "sha1": "65c0271d4bc104a6da8b1efc50021d445a9d8bb2",
+      "sha256": "723e9ffdb9cec9565d9bbbdb27b4d19a9b0ba4ff006e1ab8b94022ae5c426450"
+    },
+    {
+      "bytes": 416768,
+      "path": "data_sts2_linuxbsd_x86_64/Steamworks.NET.dll",
+      "sha1": "a84d864856652dc07f634d815d8bdac1a0d7b5bd",
+      "sha256": "1dac8e6e05d89dc1445cebc6e02744c64cdf063adf42f6d1bb22da287ee7d665"
+    },
+    {
+      "bytes": 36096,
+      "path": "data_sts2_linuxbsd_x86_64/sts2.deps.json",
+      "sha1": "a7934b0fe37bf07c9fc5ccf1443cf31bd3d53a45",
+      "sha256": "0a62999f5909297fe0a0815be28fa9c307dc1a3befd308b6a49493ac1d373a7e"
+    },
+    {
+      "bytes": 9756160,
+      "path": "data_sts2_linuxbsd_x86_64/sts2.dll",
+      "sha1": "60032c5ee49231dd08cde3d60b733f5374389c60",
+      "sha256": "2b40d2df538db1ceb5fa48d958c80ab730ada1e07db88a870aff01a661768b9f"
+    },
+    {
+      "bytes": 357,
+      "path": "data_sts2_linuxbsd_x86_64/sts2.runtimeconfig.json",
+      "sha1": "2f59bce92b2eab390e4d1507fb5231d43c4a9d6a",
+      "sha256": "bd81a252bc3f0e8bcb649b404c1da945913c5377b9d3a2c416c52730be8714c0"
+    },
+    {
+      "bytes": 56104,
+      "path": "data_sts2_linuxbsd_x86_64/System.IO.Hashing.dll",
+      "sha1": "aecc720fdb3cc83b2efbe5b53a425e8bf1ab6e55",
+      "sha256": "fbe8c2fcb4adc01da5c3c8ed0d727903b8fda1e6b84da3c447c9794615f30664"
+    },
+    {
+      "bytes": 274944,
+      "path": "data_sts2_linuxbsd_x86_64/Vortice.DirectX.dll",
+      "sha1": "d55fcf440c71fbba59699f7f11efdfbc714bd04f",
+      "sha256": "5e1da8c22e0a33cc24078965c80ca4093a2c806aa580076441eb0f27ef38b56f"
+    },
+    {
+      "bytes": 91136,
+      "path": "data_sts2_linuxbsd_x86_64/Vortice.DXGI.dll",
+      "sha1": "0fbccbeef1f5d74bcf9baca693a82a1162fb1fe1",
+      "sha256": "616983bed0d84c6ad499d1963edf12bb5bfe701e60a3ba860d1768516bf56d20"
+    },
+    {
+      "bytes": 125440,
+      "path": "data_sts2_linuxbsd_x86_64/Vortice.Mathematics.dll",
+      "sha1": "2c17947a45cb56fa15aded0a26cdbdc5121ca8c3",
+      "sha256": "bf8aa203d01c565a26811e5b32afba5030c7c6e05298487c6d24608e4fb43fad"
+    },
+    {
+      "bytes": 1688248,
+      "path": "libfmod.so",
+      "sha1": "b27bee0519b5289752a29a6eb853deadd0cd29d2",
+      "sha256": "d2abe192c8ddd8942d7a62f2c7ff674d73423ea9b1be6b087e5de0cfb30bc4bb"
+    },
+    {
+      "bytes": 1688248,
+      "path": "libfmod.so.14",
+      "sha1": "b27bee0519b5289752a29a6eb853deadd0cd29d2",
+      "sha256": "d2abe192c8ddd8942d7a62f2c7ff674d73423ea9b1be6b087e5de0cfb30bc4bb"
+    },
+    {
+      "bytes": 1688248,
+      "path": "libfmod.so.14.6",
+      "sha1": "b27bee0519b5289752a29a6eb853deadd0cd29d2",
+      "sha256": "d2abe192c8ddd8942d7a62f2c7ff674d73423ea9b1be6b087e5de0cfb30bc4bb"
+    },
+    {
+      "bytes": 1622616,
+      "path": "libfmodstudio.so",
+      "sha1": "91bbab6267c178f1aa6fdd8e9567dc588c80bdbd",
+      "sha256": "cc7a86fd2b53028be8974b9f968040dcf32528bac9eb52c448ea0f66c842712e"
+    },
+    {
+      "bytes": 1622616,
+      "path": "libfmodstudio.so.14",
+      "sha1": "91bbab6267c178f1aa6fdd8e9567dc588c80bdbd",
+      "sha256": "cc7a86fd2b53028be8974b9f968040dcf32528bac9eb52c448ea0f66c842712e"
+    },
+    {
+      "bytes": 1622616,
+      "path": "libfmodstudio.so.14.6",
+      "sha1": "91bbab6267c178f1aa6fdd8e9567dc588c80bdbd",
+      "sha256": "cc7a86fd2b53028be8974b9f968040dcf32528bac9eb52c448ea0f66c842712e"
+    },
+    {
+      "bytes": 2124216,
+      "path": "libGodotFmod.linux.template_release.x86_64.so",
+      "sha1": "8b3cac2b9fa06ee23ad13c0d8fef7978ff64869d",
+      "sha256": "103aa36461067c49a321a15b0a34ecec090b45fbebfd64cd618d52db73130f6f"
+    },
+    {
+      "bytes": 4455768,
+      "path": "libsentry.linux.release.x86_64.so",
+      "sha1": "0709ad64ec881a98055d1ffdb740b9b93d0d0965",
+      "sha256": "6f1d8988f49c9ec88d7a8037a4a28bea1464e25f9e49d12c445dc4b63e6ab5a4"
+    },
+    {
+      "bytes": 3134184,
+      "path": "libspine_godot.linux.template_release.x86_64.so",
+      "sha1": "a4aba23b0ff7478d5d6e931f9f5db220cace1d59",
+      "sha256": "7f3ed3a056347028226463052848d69d3dfff4c0eeb51d499fe29f88793e012a"
+    },
+    {
+      "bytes": 150,
+      "path": "release_info.json",
+      "sha1": "5526afab041bd6eda94b8fcb9dfbc3b6825c6604",
+      "sha256": "9e5dbce5bcd8ff3b7b432291200220642408e31b8bae7bba14f39aeb6914cd51"
+    },
+    {
+      "bytes": 1990363992,
+      "path": "SlayTheSpire2.pck",
+      "sha1": "3a2d098fb61497ec3b2ce31159939c4681b53514",
+      "sha256": "42443027622a6a82de8ab21e81ed5b68e522c0f5647fb6a26a74c4a0970a0d34"
+    }
+  ],
+  "projectBinary": {
+    "bytes": 24693,
+    "name": "original-project.binary",
+    "sha256": "88bc2e4f6a2627204b20a714cb8746a269c009e48255dcfc7a0eaef9503d2227"
+  },
+  "platform": "linux",
+  "architecture": "x86_64",
+  "executable": {
+    "path": "SlayTheSpire2",
+    "sha256": "0b0ae3859c4c26d352b6483dc1cb11601a07bbc9890d97bcebae0d5d0bdd99ff",
+    "bytes": 70349168
+  }
+}

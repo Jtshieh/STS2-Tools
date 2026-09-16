@@ -1,0 +1,12 @@
+{
+  "version": "v0.111.0",
+  "commit": "41cef1ea",
+  "build": 24724944,
+  "files": {
+    "Contents/MacOS/Slay the Spire 2": "ec8c10831dbb424c45859907f5ef6a7711f7a6e9a02f386ad13922ba8a7fcbe7",
+    "Contents/Resources/Slay the Spire 2.pck": "b3c9f133143f98a1c329c3d2efc7d8a9feb395db46fd3965b899487bf1f4d106",
+    "Contents/Resources/data_sts2_macos_arm64/sts2.dll": "9cb4f1ad8c9f284aa8fec3122ffd6d780bbf543d875c817abdd12ff63fbf12b4",
+    "Contents/Resources/data_sts2_macos_arm64/0Harmony.dll": "ef1898322c9f5c86dc1b0758b272a9c440823b4a41ca9a0b82a3aa6b3d206387"
+  },
+  "patchedHarmonySha256": "c5460511157fd207668b6c1489861bbdcbafed3494f9174a48eb549300ea3579"
+}

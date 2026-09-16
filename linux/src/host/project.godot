@@ -1,0 +1,16 @@
+; Own, game-free Linux host controls. No game resources or autoloads.
+config_version=5
+_custom_features="dotnet"
+config/features=PackedStringArray("4.5", "C#", "GL Compatibility")
+
+[application]
+config/name="E003 Linux Host Controls"
+run/main_scene="res://Main.tscn"
+run/flush_stdout_on_print=true
+
+[dotnet]
+project/assembly_name="E003LinuxHostControls"
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
