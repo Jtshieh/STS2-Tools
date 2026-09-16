@@ -33,7 +33,15 @@
       "origin": "Project-authored release integration/configuration/documentation; MIT"
     },
     {
+      "path": "PROTOCOL.zh-CN.md",
+      "origin": "Project-authored release integration/configuration/documentation; MIT"
+    },
+    {
       "path": "README.md",
+      "origin": "Project-authored release integration/configuration/documentation; MIT"
+    },
+    {
+      "path": "README.zh-CN.md",
       "origin": "Project-authored release integration/configuration/documentation; MIT"
     },
     {

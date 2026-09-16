@@ -3,10 +3,12 @@
 LICENSE
 NOTICE.md
 README.md
+README.zh-CN.md
 RELEASE.md
 RELEASE_FILES.txt
 VERSION
 docs/REPLAY.md
+docs/REPLAY.zh-CN.md
 linux/.gitignore
 linux/LICENSE
 linux/LICENSES/Godot.txt
@@ -14,7 +16,9 @@ linux/LICENSES/RunReplays.txt
 linux/LICENSES/divine-sts2.txt
 linux/NOTICE.md
 linux/PROTOCOL.md
+linux/PROTOCOL.zh-CN.md
 linux/README.md
+linux/README.zh-CN.md
 linux/RELEASE.md
 linux/RELEASE_FILES.txt
 linux/SOURCE_ORIGINS.json
@@ -65,6 +69,7 @@ linux/src/host/run-normal-boot.py
 linux/tests/test_contracts.py
 linux/tests/test_work_materials.py
 mac/README.md
+mac/README.zh-CN.md
 mac/build.py
 mac/common.py
 mac/config/game-macos-arm64.json

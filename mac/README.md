@@ -1,26 +1,89 @@
-# Mac 语义动作录制器
+# Mac gameplay recorder
 
-支持 **macOS arm64 / STS2 v0.111.0 / 41cef1ea / build 24724944**。这是被动 mod：观察玩家输入、原引擎接受结果与下一决策点，不自动决策、不解锁、不强制遭遇、不设置种子或999格挡。
+English | [简体中文](README.zh-CN.md) | [Project overview](../README.md)
 
-## 推荐：直接安装 mod
+Collect human demonstrations while playing STS2 with the mouse. The recorder captures semantic inputs, targets, selection choices, and the player-visible observation at the next decision. Use these trajectories for dataset processing, imitation learning, or [Linux replay](../docs/REPLAY.md).
 
-1. 退出游戏。从仓库 Releases 下载 Mac mod ZIP，或按下节从源码构建。
-2. Steam 的“浏览本地文件”找到 `SlayTheSpire2.app`；Finder 中“显示包内容”，打开 `Contents/MacOS/mods`。没有 `mods` 时新建该目录。
-3. 把 ZIP 中的 **Sts2Recorder.dll** 和 **Sts2Recorder.json** 放进去。许可文本请与安装包一起保留。不要复制任何游戏 DLL。
-4. 正常启动游戏，完成游戏自己的 mod 加载提示。为了使用本项目已审查的范围，禁用其他 mod。
-5. 主菜单显示 `RECORDER READY` 和日志路径后，选择自己的 profile，开始 Silent A0，正常鼠标游玩。游戏中显示 `RECORDER ON`；`INCOMPLETE` 表示日志存在问题，不能当成完整轨迹。
+## Compatibility
 
-日志写入 Godot `user://sts2-recorder/logs/<process-id>/`。**具体绝对位置由游戏决定，并显示在主菜单和游戏日志中**，不硬编码 Steam 账号路径。每次进程独立一个目录，核心文件是 `actions.jsonl`；`replay-input.private.json` 的种子只供验证，不属于策略观察。退出/重开不会自动拼成连续轨迹。
+| Item | Supported configuration |
+| --- | --- |
+| Game | v0.111.0 / 41cef1ea / Steam build 24724944 |
+| Platform | macOS Apple Silicon / arm64 |
+| Gameplay | Single-player Silent A0, using your own progression |
+| Release | v0.1.0-alpha; recorder revision 0.2.3 |
 
-直接安装模式使用游戏自己的保存位置和 modded profile。录制器不复制或合成解锁；若 modded profile 尚无你的进度，可使用下面的独立副本准备流程。原生 mod 的完整保存位置/Steam 行为尚未作为本版本新验收，工具不会替你修改云同步。
+The [Mac manifest](config/) contains platform-specific file hashes.
 
-卸载时先退出游戏，再移除这两个 mod 文件。日志和正常游戏存档保留。不要在游戏运行中替换 DLL。
+## What you need
 
-### 从源码构建 mod ZIP
+### Provided by this repository
 
-需要 Python 3.12 和本机 arm64 .NET 9 SDK（实测 9.0.303）。游戏随附的 `sts2.dll`、`GodotSharp.dll`、`0Harmony.dll` 仅作为本地编译引用；它们不会被打包。
+| Item | Purpose and access |
+| --- | --- |
+| Precompiled mod | [Download Mac ZIP](https://github.com/Jtshieh/STS2-Tools/releases/download/v0.1.0-alpha/Sts2Recorder-macos-arm64-v0.1.0-alpha.zip). Install `Sts2Recorder.dll` and `Sts2Recorder.json`; retain the included license files. |
+| Recorder source and build script | [src/](src/) and [build.py](build.py), available in the [source ZIP](https://github.com/Jtshieh/STS2-Tools/archive/refs/heads/main.zip). Build or modify the mod locally. |
+| Workspace and export tools | [prepare.py](prepare.py), [launch.py](launch.py), and [export_trace.py](export_trace.py) create a separate game/profile workspace and organize recorded trajectories. |
+| Version configuration | [config/](config/) identifies the compatible Mac game files. |
 
-在仓库根目录执行：
+### Prepare yourself
+
+| Route | Requirements |
+| --- | --- |
+| Install the precompiled mod | Compatible Mac game and your game profile. The game supplies .NET and Harmony for mod loading. |
+| Export a session | Python 3.12 and the repository source. |
+| Build from source | Python 3.12, arm64 .NET 9 SDK (reference version 9.0.303), and the compatible game app as a local assembly reference. |
+| Create a separate workspace | Source-build requirements, macOS `/usr/bin/sandbox-exec`, and your account's `profile.save` plus `profileN/saves/prefs.save` and `progress.save`. Continue also uses the starting `current_run.save`. |
+
+## Install the mod
+
+1. Exit the game and download the mod ZIP above.
+2. In Steam, browse the game's local files. In Finder, choose **Show Package Contents** for `SlayTheSpire2.app` and open `Contents/MacOS/mods`. Create `mods` if needed.
+3. Copy `Sts2Recorder.dll` and `Sts2Recorder.json` into that directory.
+4. Launch the game and complete its mod-loading prompt. For recordings to replay with this environment, enable the recorder alone.
+5. At the main menu, check for `RECORDER READY` and the log path. Select your profile and start Silent A0. During play, the indicator shows `RECORDER ON`.
+
+This installation uses the game's normal modded profile and save location. To start from an existing progression in a separate profile workspace, use the preparation flow below.
+
+To uninstall, exit the game and remove the two recorder files. Your saves and recorded sessions remain available.
+
+## Record and find your logs
+
+Play through combat, rewards, map choices, events, shops, rest sites, and nested card selections. Each game process writes a separate session under Godot's `user://sts2-recorder/logs/<process-id>/`. The main menu and game log display its absolute path.
+
+| File | Use |
+| --- | --- |
+| `actions.jsonl` | Append-only semantic events: observations, inputs, acceptance/delivery status, nested choices, and successors. |
+| `replay-input.private.json` | Run seed and version information for initializing replay. Keep this separate from model observations. |
+
+The `INCOMPLETE` indicator means the session contains a recording issue. Inspect the export report before selecting a segment for training or replay. Menu returns, loads, and restarts create continuity boundaries; process separate segments individually.
+
+## Export and process demonstrations
+
+After exiting the game, run this command from the repository root. Use the session path displayed by the recorder and a new output directory:
+
+```bash
+python3 -B mac/export_trace.py \
+  --session '/absolute/path/to/session' \
+  --output '/absolute/path/to/new-private-export'
+```
+
+| Export file | Meaning |
+| --- | --- |
+| `actions.raw.jsonl` | Unmodified captured event stream. This or the original `actions.jsonl` is the Linux import input. |
+| `commands.proposed.jsonl` | Candidate observation/action pairs for your dataset processing. |
+| `successors.jsonl` | Recorded observations following inputs, including nested decision boundaries. |
+| `rejected-attempts.jsonl` | Purchase attempts that were rejected by the game. |
+| `conversion.json` | Event counts, continuity/recording issues, and mappings requiring review. |
+| `SHA256SUMS` | Hashes of the exported files. |
+
+For imitation learning, pair each input's observation with its recorded choice and check delivery and successor events. Use `conversion.json` when filtering or labeling samples. A selection input and its final selection result describe different stages of the same interaction; count the input as the decision. The exporter's proposed mappings and `structuralReady` field are preprocessing diagnostics. Use the Linux replay result for cross-platform comparison.
+
+Continue with [Mac-to-Linux replay](../docs/REPLAY.md) or the [trajectory protocol](../linux/PROTOCOL.md) to build your own processing pipeline.
+
+## Build the mod from source
+
+Run from the repository root:
 
 ```bash
 python3 -B mac/build.py \
@@ -28,13 +91,13 @@ python3 -B mac/build.py \
   --dotnet '/absolute/path/to/dotnet'
 ```
 
-读取原 app，输出 `mac/.private/dist/Sts2Recorder-macos-arm64-v0.1.0-alpha.zip`，不会向原 app 自动部署。构建离线运行，禁用开发证书生成与遥测，不安装系统依赖。游戏版本/架构不匹配会停止。
+The ZIP is written to `mac/.private/dist/Sts2Recorder-macos-arm64-v0.1.0-alpha.zip`. Install it using the steps above. The build references the game's local `sts2.dll`, `GodotSharp.dll`, and `0Harmony.dll` and packages the recorder's own assembly.
 
-## 可选：独立游戏和 profile
+## Optional: separate game and profile workspace
 
-此方式用普通独立文件复制 app 和自己的 profile，写入仅允许工作副本与日志目录，游戏网络关闭。原 Steam 安装、云设置和原存档不变。需要 macOS 现有 `/usr/bin/sandbox-exec`；不可用时明确失败，不自动降级隔离。
+Use this route to record with an independent game/profile copy and preserve the exact starting saves for replay. `profile.save` selects the profile; `progress.save` stores progression; `current_run.save` stores an in-progress run. Match `--profile-id` to the selector and `profileN` directory.
 
-从自己游戏的账户保存根目录找到 `profile.save`（选择器）与对应 `profileN/saves/` 中的 `progress.save`（长期解锁）、`prefs.save`。选中的 profile id 必须一致。日志和 Steam userdata 可能帮助定位，但请用实际文件核实，不猜账号目录。
+Run from the repository root:
 
 ```bash
 export STS2_MAC_WORK='/absolute/path/to/recorder-workspace'
@@ -50,42 +113,22 @@ python3 -B mac/build.py --workspace "$STS2_MAC_WORK" \
 python3 -B mac/launch.py --workspace "$STS2_MAC_WORK"
 ```
 
-需要 Continue 时，prepare 显式增加 `--current-run '/absolute/path/to/current_run.save'`；默认不导入当前局。可用 `--settings '/absolute/path/to/settings.save'` 原样复制自己的现有设置。首次出现原游戏的 mod 提示时手动同意，正常退出并重新启动；录制器不替你点击提示或更改同意状态。
+For Continue, add `--current-run '/absolute/path/to/current_run.save'` to `prepare.py`. To reuse game settings, add `--settings '/absolute/path/to/settings.save'`. Use a new workspace for a different starting state.
 
-准备会把同一份原 selector/progression 复制到独立普通和 modded profile 中，不合成解锁。禁止覆盖已准备目录；需要新的初始化条件时选择新 workspace。工作副本允许正常保存。
+Preparation creates ordinary copies of the app and your profile. The launcher restricts writes to the workspace and logs, with game networking disabled. The working profile saves normally. Complete the game's initial mod prompt, then exit and relaunch if it requests a restart.
 
-准确输出：
+Paths beneath `$STS2_MAC_WORK/.private/`:
 
-```text
-$STS2_MAC_WORK/.private/work/SlayTheSpire2.app
-$STS2_MAC_WORK/.private/work/profile/default/1/modded/profileN/saves/
-$STS2_MAC_WORK/.private/profile-input/           准备时原始profile副本
-$STS2_MAC_WORK/.private/logs/<process-id>/
-  actions.jsonl
-  initial-profile/                              该次启动前的精确存档副本
-  profile-before-launch.json
-  launch.json / launcher-exit.json
-```
+| Path | Content |
+| --- | --- |
+| `work/SlayTheSpire2.app` | Playable game copy with the built recorder installed. |
+| `work/profile/default/1/modded/profileN/saves/` | Working modded profile. |
+| `profile-input/` | Profile files captured during preparation. |
+| `logs/<process-id>/` | Session events and launch metadata. |
+| `logs/<process-id>/initial-profile/` | Exact profile files copied before that launch; retain these for Continue replay. |
 
-隔离启动器只在工作副本中调整随附 Harmony 的临时辅助库路径，使其写入工作目录 `tmp/`；没有游戏规则补丁，原依赖不修改。普通 drop-in mod 不需要此路径调整。
+The session exporter copies event files and metadata. Transfer `initial-profile/` separately when preparing Linux replay.
 
-## 导出与 Linux
+## License
 
-退出游戏后，从主菜单显示的路径或独立启动器输出取得会话目录：
-
-```bash
-python3 -B mac/export_trace.py \
-  --session '/absolute/path/to/session' \
-  --output '/absolute/path/to/new-private-export'
-```
-
-导出保留原始记录、失败及后继；`commands.proposed.jsonl` 是待验证映射，不能等同于已接受回放。导出报告保守地标出需要逐段审查的绑定。Linux 通用入口直接读取原始 `actions.jsonl`，步骤见 [跨平台回放](../docs/REPLAY.md)。不要将任何私人导出提交 Git。
-
-## 已知限制
-
-- 普通 mod 自动初始化和原生启动会单独验证；有设置差异的首次 mod 提示可能需要手动处理。
-- 旧的 `next_act` 父子归属仍未修复，通用回放在此明确拒绝；不宣称整局自动跨幕回放。
-- 占卜界面明确不支持。卡牌状态投影支持升级、附魔、污染、锁牌等字段，但不保证所有机制分支已实测。
-- 多药水弹窗查询现在过滤已标记移除的对象；真正多活动对象仍报错，不随便取第一个。
-- 无人工思考超时。未知观察会标记日志不完整，不主动终止玩家游戏。
-- 版本范围、原生测试结果及跨平台结论见 [RELEASE.md](../RELEASE.md)。
+[MIT](../LICENSE), with [recorder attribution](src/ATTRIBUTION.md) and [third-party notices](../NOTICE.md).

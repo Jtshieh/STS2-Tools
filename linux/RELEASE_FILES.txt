@@ -5,7 +5,9 @@ LICENSES/RunReplays.txt
 LICENSES/divine-sts2.txt
 NOTICE.md
 PROTOCOL.md
+PROTOCOL.zh-CN.md
 README.md
+README.zh-CN.md
 RELEASE.md
 RELEASE_FILES.txt
 SOURCE_ORIGINS.json

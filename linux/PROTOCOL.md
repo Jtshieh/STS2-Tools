@@ -1,50 +1,94 @@
-# 协议 v1 与连续性
+# Observation, action, and trajectory protocol
 
-版本：发行 `v0.1.0-alpha` / `ver0.1`；动作日志 `sts2-action-log-v1`；玩家观察 `sts2-observation-v1`；回放包 `sts2-replay-bundle-v1`。破坏字段语义的变更必须提高 schema 版本。
+English | [简体中文](PROTOCOL.zh-CN.md) | [Linux guide](README.md)
 
-## 动作与观察
+The Linux interface exposes decisions from the original game through a file bridge. The supplied Python controller wraps that bridge with a JSONL policy worker. This page describes the contracts used by controllers, dataset processors, and replay adapters.
 
-运行中的文件桥在每次私有运行目录 `runtime-work/bridge/`。`observation.json` 给出 `processRunId`、`decisionId`、`state` 和 `actions`。动作请求为三个字段：
+| Data | Schema |
+| --- | --- |
+| Linux observation | `sts2-observation-v1` |
+| Linux action log | `sts2-action-log-v1` |
+| Mac semantic events | `sts2-gui-semantic-v1` |
+| Imported replay bundle | `sts2-replay-bundle-v1` |
+
+## Observation and policy response
+
+An observation contains:
+
+| Field | Meaning |
+| --- | --- |
+| `schema` | Observation schema version. |
+| `processRunId`, `decisionId` | Identity of this process and decision. |
+| `state` | Current phase and player-visible state, including phase-specific card, target, option, and resource information. |
+| `actions` | Currently available choices, each with `id`, `kind`, `label`, and `detail`. |
+
+The policy receives one observation per stdin line and returns a JSON object with `actionId` on stdout. Select that value from the current `actions[].id`. Additional fields such as `controller` and `reason` are used by the example worker; the controller consumes `actionId`. See [policy integration](README.md#connect-your-policy).
+
+`actions[].detail` preserves the choice's card, target CombatId, option, cost, or other relevant identity. Card `instance` values are stable within a process. Across processes, maintain a one-to-one identity mapping; card display positions can change between observations.
+
+Policy observations contain player-visible state. Replay seeds and starting saves belong to initialization metadata, outside the policy observation.
+
+## File bridge
+
+The session's `runtime.json` points to `evidenceRoot`; bridge files are under `evidenceRoot/runtime-work/bridge/`. The engine writes observations and status files atomically.
+
+1. Read `observation.json` and remember its `(processRunId, decisionId)`.
+2. Choose an action from that observation.
+3. Write a temporary file in the bridge directory and atomically rename it to `action.json`. Use the observation's process/decision identity and the selected action ID.
+4. Check `heartbeat.json` for an increased `submittedCount` and `rejection.json` for a matching rejected request.
+5. Read the next decision with a new identity, or `terminal.json` for game-over or decision-budget completion.
+
+Request shape, with illustrative identifiers:
 
 ```json
-{"processRunId":"synthetic-process","decisionId":1,"actionId":"synthetic:choose"}
+{"processRunId":"example-process","decisionId":1,"actionId":"example-action"}
 ```
 
-这是合成格式示例，不是有效游戏动作。只能提交当次观察列出的唯一 `actionId`；重复、过期、错误进程或非法动作会拒绝，不增加执行数。`actions[].detail` 保留当时的卡牌、目标 CombatId、选项、费用等身份。卡牌 `instance` 仅在录制进程中稳定；跨进程需双向一一对应，不能把手牌/网格显示序号当成永久身份。
+The engine rejects stale, duplicate, wrong-process, or unavailable actions. A changed game state can invalidate an observation, so submit against the latest decision. Use a single controller and keep one request in flight. To use a custom controller, replace the decision/submission loop in [sts2_play.py](scripts/sts2_play.py) or reuse its launch orchestration with your bridge consumer.
 
-每次选择是一条实际输入，包括嵌套弃牌、选牌与确认。`completed` 表示获得该输入之后的稳定决策边界；后继 `state.phase` 为 `hand_selection`、`grid_selection`、`choose_card` 等时，父动作仍需这些嵌套选择才能完成整个游戏结算，不能把它误读为原引擎异步任务已完成。
+`heartbeat.json` reports `decisionId`, `phase`, `waiting`, `elapsedSeconds`, and `submittedCount`. `waiting` distinguishes controller input from game progress. A matching `rejection.json` contains the request and reason. `terminal.json` contains `outcome`, `submittedCount`, and the terminal state.
 
-自动抽牌、伤害、敌方行动、遗物触发、Spiral 自动重放属于结果，不生成新的玩家输入。观察仅投影玩家可知状态；不输出隐藏 RNG、未知抽牌顺序、完整引擎状态、未来结果或 restore handle。seed 与初始存档在启动配置/特权谱系中，策略接收的观察不包含它们。
+## Decision boundaries
 
-## 导出动作日志
+Each player input is a decision, including selecting, deselecting, and confirming cards in nested choices. A `completed` record means that input reached an observed successor boundary. If the successor phase is `hand_selection`, `grid_selection`, or `choose_card`, continue with the choices offered there to finish the interaction.
 
-每行由 `schemas/action-log-v1.json` 和 `scripts/protocol.py` 定义：
+Automatic draws, damage, enemy actions, and relic triggers are reflected in the successor state. Selection results describe what the engine accepted after the input sequence. Dataset processors should preserve the relation between parent actions, nested inputs, and final results.
 
-| 字段 | 含义 |
+## Exported action log
+
+[schemas/action-log-v1.json](schemas/action-log-v1.json) and [scripts/protocol.py](scripts/protocol.py) define each JSONL row:
+
+| Field | Meaning |
 | --- | --- |
-| schema | 固定 `sts2-action-log-v1` |
-| rootRunId / processRunId | 根运行与实际游戏进程身份；未进入游戏时保留启动尝试身份 |
-| slAttempt / recovery | 本版固定 0 / null；没有实现玩家 SL 或游戏进程恢复 |
-| sequence | 实际输入序号；失败/中断可为 0；不是日志行号 |
-| status | initiated、accepted、delivered、completed、rejected、failed、interrupted |
-| action | 动作 ID、decisionId；接受后包含当次观察的 kind、label、detail（含目标与选择） |
-| observation | 发起/接受的前置玩家观察，或 completed 的稳定后继；不含特权验证日志 |
-| error | 拒绝、失败、中断时必须有原因，其余为 null |
+| `schema` | `sts2-action-log-v1`. |
+| `rootRunId`, `processRunId` | Root run and actual engine process identities; launch-attempt identity is retained if the engine never reaches observations. |
+| `slAttempt`, `recovery` | `0` and `null` in this version. |
+| `sequence` | Input sequence number; startup failures/interruption can use `0`. Several lifecycle rows share a sequence. |
+| `status` | `initiated`, `accepted`, `delivered`, `completed`, `rejected`, `failed`, or `interrupted`. |
+| `action` | Action ID and decision ID; accepted actions include the observed kind, label, and detail. |
+| `observation` | Pre-action observation on initiation/acceptance, or the successor on completion. May be null for other statuses. |
+| `error` | Reason for rejection, failure, or interruption; otherwise null. |
 
-`initiated` 来源于外层实际提交；`accepted` 是引擎桥校验后的 `action_submitted`；`delivered` 表示原回调已调用；`completed` 需实际后继。导出按动作序号和生命周期排序；原日志保留实际时序。不能只数 initiated 就声称执行成功。JSON schema 和无游戏测试为合成合同检查，不能替代游戏验证。
+`initiated` records the controller's submission. `accepted` records bridge validation. `delivered` records the original callback being called. `completed` requires an observed successor. Exported rows are sorted by sequence and lifecycle status; raw controller/engine logs retain their original event order.
 
-预算结束是 `interrupted/budget_truncated`，进程异常、观察失败和输入缺失为明确失败。人工等待 900 秒、动作无稳定后继 40 秒、游戏总墙钟 1200 秒，三者含义不同；游戏 CPU 上限 1000 秒，采样聚合 RSS 上限 4 GiB。磁盘写入有监督上限，非硬配额。
+For a training transition, group by `(processRunId, sequence)` and pair the accepted observation/action with its completed successor. Completed successors contain `state` and `actions`; pre-action observations also carry the schema and decision identity. Retain rejection/failure/interruption labels separately when deciding which rows belong in a dataset.
 
-退菜单、读档、进程重启及显式 Continue 的先前连接均为连续性未验证。初始 Continue 夹具允许验证从加载后开始的一段连续输入，不能证明加载前后状态无损；模型 checkpoint 也不能恢复游戏。预算、失败与已获知识不得随回滚消失。
+## Time budgets and continuity
 
-## Mac 导入与比较
+The Linux manual controller allows 900 seconds for input. An accepted action has 40 seconds to reach a stable successor. The engine supervisor has a 1200-second wall budget, and the outer controller has a 1500-second budget including launch and shutdown. The policy worker has its own response and resource limits described in the [Linux guide](README.md#connect-your-policy).
 
-导入器读取现有 `sts2-gui-semantic-v1` 原始事件流，要求连续 eventSequence、从 actionSequence=1 开始、每个输入有接受/回调记录和后继、无跨进程/未知输入。`--actions N` 显式导出完整前 N 输入及第 N 个实际后继；不搜索未来 checkpoint 补动作。原始文件保留不变，回放包记录其哈希。
+A decision-budget stop exports `interrupted` with `budget_truncated`. Menu returns, loads, and restarts create continuity boundaries. A Continue replay begins at its supplied save and carries `initial_resume_unverified`. Treat the resulting episode as beginning at that boundary; model checkpoint resume restores training state.
 
-旧 Mac 0.2.2 的 `next_act` 没有可靠父子归属，通用导入会明确拒绝；历史 157 输入结论使用过有证据的专项转换，未作为通用豁免。未知 UI 输入同样拒绝；本版不猜测它是否纯展示。
+## Mac input mapping
 
-比较保留事件选项、奖励、费用、资源、卡牌实例映射、升级/附魔/污染/锁牌、跨幕状态。网格显示重排按已知实例匹配；首次奖励卡仅允许完整机械属性唯一匹配，重复候选会失败。
+[import_trace.py](scripts/import_trace.py) converts raw Mac semantic events into a replay bundle. It selects the complete prefix requested by `--actions N`, beginning at `actionSequence=1`, and stores the raw-file hash and recorded endpoint. Each input needs acceptance/callback evidence and a successor, with consecutive events and one process/run identity.
 
-仅规范化已审查的 Neow 问候、Tezcatara 问候前缀、火堆同义展示格式、完整网格卡牌标签排列和缺失 NCard 展示节点；原观察不修改。Mac 拖牌时的 end_turn 可用性差异单列为时机差异，默认拒绝；显式 `--allow-timing-differences` 只允许有记录的机械比较，结果中 `strictDecisionTimingMatched=false`。不可将其称作严格 GUI 输入一致或整局保真。
+The bundle contains recorded commands and observations, the seed, the start mode, and the initial save hash for Continue. [Mac-to-Linux replay](../docs/REPLAY.md) explains how to prepare these files. Unsupported events and unbound `next_act` inputs produce import errors identifying the required adaptation.
 
-所有真实输出默认私有；玩家可见投影仍可能包含用户游玩数据，并非自动获得公开许可。策略在单独 namespace 中仅接收观察与可选模型，游戏、存档和特权日志不挂载给它。
+## Replay comparison
+
+The comparator preserves event options, rewards, costs, resources, card upgrades/effects, and transition state. It maps card instances across processes, matches reordered grids by identity, and allows a newly encountered reward card to match by unique full mechanical properties. Ambiguous candidates fail comparison.
+
+The defined display normalizations cover Neow greetings, the Tezcatara greeting prefix, equivalent rest-site display text, ordering of complete grid-card labels, and absent NCard display nodes. Original observations remain intact. See [compare_gui.py](scripts/compare_gui.py) for the exact transformations.
+
+An `end_turn` availability difference during Mac card dragging is reported as a timing difference. Replay rejects it by default; `--allow-timing-differences` allows this case while retaining a separate `strictDecisionTimingMatched: false` result. Other state/action differences stop comparison. The [replay guide](../docs/REPLAY.md#read-the-result) explains the output fields.

@@ -1,32 +1,37 @@
-# Mac → Linux 回放
+# Replay Mac demonstrations on Linux
 
-## 两端分别准备游戏
+English | [简体中文](REPLAY.zh-CN.md) | [Project overview](../README.md)
 
-Mac 需要 Mac arm64 游戏，Linux 需要 Linux x86_64 游戏，均为 v0.111.0 / 41cef1ea / build 24724944。不能把 Mac app 当作 Linux 游戏运行，也不要求两平台 DLL 哈希一致。
+Replay executes the recorded human choices through the Linux engine interface and compares the observations at decision boundaries. Use it to inspect demonstration data, reproduce interactions, and obtain Linux action logs for further processing.
 
-Mac mod 负责记录输入，Linux 环境负责执行输入和比较决策边界。两端都必须自行提供正版游戏，仓库没有游戏资源、progression 或实际轨迹。
+## Prepare the starting state
 
-## 先取得可复现的起点
+Both platforms use STS2 v0.111.0 / 41cef1ea / Steam build 24724944: the Mac arm64 game for recording and the Linux x86_64 game for replay. Each platform has its own file-hash manifest.
 
-最清楚的方式是使用 [Mac 独立副本](../mac/README.md#可选独立游戏和-profile) 的显式 Continue 输入；启动器在日志 `initial-profile/` 中保存实际启动前的文件。
+Choose a starting boundary before recording:
 
-普通 mod 不自动复制 Steam 存档或创建完整恢复点。若希望比较 Continue，必须在录制前自行保留那份初始 current_run、selector、progression/prefs；结束后的 current_run 通常已被游戏改写，不能代替起点。
+| Start | Materials to preserve |
+| --- | --- |
+| Continue | Initial `current_run.save`, account `profile.save`, and the active profile's `progress.save` and `prefs.save`. |
+| New run | Matching profile progression, character Silent, Ascension 0, Standard mode, tutorial settings, and recorded seed. |
 
-新局回放还要求相同角色、A0、模式、progression 和已记录种子。接口支持新局，但本版新增加的跨平台验收使用 Continue 短段；不要据此宣称任意新局一致。
+For Continue, the [Mac separate-workspace launcher](../mac/README.md#optional-separate-game-and-profile-workspace) captures the exact pre-launch saves in the session's `initial-profile/` directory. Select files from the active modded profile there. With the drop-in mod, preserve those starting files yourself before recording. The save written after playing represents a later state.
 
-## 私下转移最小材料
+Read the seed from `replay-input.private.json`. Keep initialization metadata separate from the observations used by your policy.
 
-只向你控制且已授权的 Linux 主机转移：
+## Collect the replay inputs
 
-- 原始 `actions.jsonl`；不要改写事件或填补缺失动作。
-- `replay-input.private.json` 中的 seed 和版本信息，供验证入口使用。
-- 起点的 profile 输入；Continue 必须附上那份初始 current_run。
+Transfer these files to your Linux workspace's `.private/` directory, with directory permissions `0700`:
 
-这些文件只放 `.private`（0700），不发到 GitHub issue、公共 CI 或本仓库。玩家观察与隐藏验证资料保持分离。
+- Original `actions.jsonl`, or the byte-preserving `actions.raw.jsonl` from [Mac export](../mac/README.md#export-and-process-demonstrations).
+- `replay-input.private.json` for the seed and version.
+- Starting profile files from the table above. Transfer `initial-profile/` separately when using the Mac launcher; the session exporter copies events and metadata.
 
-## Linux 命令
+The Linux importer reads the raw semantic event stream. `commands.proposed.jsonl` is a preprocessing output for reviewing mappings and building datasets.
 
-按 [Linux README](../linux/README.md) 准备依赖和新 workspace，`prepare.py` 传入匹配的 profile 与 `--current-run`。随后在仓库的 `linux/` 目录运行：
+## Prepare Linux and import a segment
+
+Follow [Linux setup](../linux/README.md#prepare-a-workspace) with the starting profile. For Continue, add `--current-run` with the preserved initial run save to `prepare.py`. Keep the resulting `STS2_WORK` value. Run the following commands from the repository's `linux/` directory:
 
 ```bash
 python3 -B scripts/import_trace.py \
@@ -41,12 +46,32 @@ python3 -B scripts/sts2_play.py \
   --seed 'RECORDED_SEED' --root-run replay-1 --decisions 12 --tutorials no
 ```
 
-这里的12是示例上限，必须换成轨迹中从动作1开始连续完整的一段，`--decisions` 必须匹配导入包输入数。不要为了让导入通过删除失败/重启/未知输入事件。
+Replace `RECORDED_SEED` with the recorded seed. Replace `12` with the number of consecutive inputs to replay, starting at action 1; each input must have a recorded successor. `--decisions` must equal the imported input count. The importer stores the initial run-file hash and the final recorded observation in the bundle.
 
-## 什么算通过
+For a new-run workspace, import with `--start new` and omit `--current-run`; keep the seed and other starting conditions matched. The same replay command consumes that bundle.
 
-输入送达、原引擎接受、动作后继、机械观察一致和完整进程验收分别记录。只有已审查的纯展示差异允许规范化；卡牌状态、选项、奖励和结算差异不能忽略。
+## Read the result
 
-当前通用导入会拒绝旧 `next_act`、未知 UI 输入和缺失后继。157输入跨幕证据使用过专门审查的转换，不是通用导入器已覆盖所有轨迹的证明。鼠标拖牌造成的按钮时机差异有独立开关和报告，不能标成严格一致。
+`sts2_play.py` prints a `launchEvidence` directory. When replay finishes successfully, its `replay-result.json` contains:
 
-回到菜单、读档或重启之后的衔接仍未验证；保留片段和中断，不能直接拼接。详细协议见 [linux/PROTOCOL.md](../linux/PROTOCOL.md)。
+| Field | Interpretation |
+| --- | --- |
+| `inputs` | Number of recorded inputs consumed. |
+| `mechanicalMatched` | Recorded decision states and the endpoint matched under the comparator's defined normalizations. |
+| `strictDecisionTimingMatched` | Decision availability matched, including button timing. |
+
+`action-log.jsonl` contains action lifecycle records and successor observations. On an import or replay error, inspect the reported event/action and the session's `exit.json` and `launcher.log`. Preserve the original recording when investigating a mismatch.
+
+Comparison covers card identities and effects, event options, rewards, resources, and transition states. Card instance IDs are mapped across processes. The exact display normalizations are listed in the [protocol](../linux/PROTOCOL.md#replay-comparison).
+
+Mouse dragging can change when `end_turn` is exposed. To study this specific timing difference, add `--allow-timing-differences` to the replay command. When used to accept a timing difference, the result records `strictDecisionTimingMatched: false` while reporting the mechanical comparison separately.
+
+## Handle recording boundaries
+
+The importer requires one process/run identity, consecutive events, accepted inputs, and actual successors for the selected segment. Missing inputs, unknown UI events, or a continuity boundary stop import. A recorded `next_act` currently stops import because its parent action attribution needs an adapter; inspect that event before extending the mapping.
+
+Treat segments after a menu return, load, or restart as separate recordings. Continue bundles carry `initial_resume_unverified`, identifying the load as their starting boundary.
+
+## Use the output in your workflow
+
+Process the accepted/completed action pairs described in the [trajectory protocol](../linux/PROTOCOL.md#exported-action-log), or use the [Linux combat sample collector](../linux/README.md#training-and-datasets). Your data pipeline can retain replay outcomes alongside each demonstration segment and decide which samples to include.
