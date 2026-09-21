@@ -93,7 +93,7 @@
     },
     {
       "path": "scripts/import_trace.py",
-      "origin": "Project-authored release integration/configuration/documentation; MIT"
+      "origin": "Project-authored deterministic callback attribution, source-bound historical adaptation and lossless provenance; MIT"
     },
     {
       "path": "scripts/package_source.py",
@@ -118,7 +118,7 @@
     },
     {
       "path": "scripts/sts2_play.py",
-      "origin": "Project-authored integration/orchestration; inherited finite divine loader design",
+      "origin": "Project-authored integration/orchestration; inherited finite divine loader design; project-authored final successor state/action verification",
       "sourceSha256BeforeReleaseEdits": "7369557092a44a820ddf9ecd74efd172c6e3299e69808df4a61ce14f4ce70c5a"
     },
     {
@@ -267,7 +267,7 @@
     },
     {
       "path": "tests/test_contracts.py",
-      "origin": "Project-authored release integration/configuration/documentation; MIT"
+      "origin": "Project-authored synthetic protocol, callback attribution, nested-input and mechanical comparison tests; MIT"
     },
     {
       "path": "tests/test_work_materials.py",

@@ -85,6 +85,10 @@ A decision-budget stop exports `interrupted` with `budget_truncated`. Menu retur
 
 The bundle contains recorded commands and observations, the seed, the start mode, and the initial save hash for Continue. [Mac-to-Linux replay](../docs/REPLAY.md) explains how to prepare these files. Unsupported events and unbound `next_act` inputs produce import errors identifying the required adaptation.
 
+The bundle retains the UTF-8 representation of exact raw bytes in `sourceRaw`, plus `sourceSha256`, the selected `sourceEventRange`, `sourceActionCount`, and individual `transformations`. Commands carry `macActionSequence`, `macEventSequence`, `parentActionSequence`, `role`, and `conversionReason`. Roles distinguish `player_input` from `nested_input`. Internal `engine_notification` events are evidence and never generate a submit. They require a notification sequence, parent action sequence, `attributionRevision=callback-scope-v1`, `relation=synchronous_callback`, and paired `callback_entered/callback_returned` statuses fully inside the original Proceed callback. Legacy traces require the explicit source-bound adapter described in the [replay guide](../docs/REPLAY.md#adapt-the-retained-cross-act-recording).
+
+Final comparison reads the actual last `action_response`, verifies its sequence and uniqueness and that its state equals `terminal.json`, then compares the complete endpoint state and legal actions. The Mac v2 export report continues to separate structure, action adaptation requirements, and unexecuted Linux replay. Import success never writes a native replay pass.
+
 ## Replay comparison
 
 The comparator preserves event options, rewards, costs, resources, card upgrades/effects, and transition state. It maps card instances across processes, matches reordered grids by identity, and allows a newly encountered reward card to match by unique full mechanical properties. Ambiguous candidates fail comparison.

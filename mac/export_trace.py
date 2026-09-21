@@ -9,7 +9,7 @@ KNOWN_EVENTS = {
  'menu_input', 'observation', 'observation_wait', 'action_initiated', 'action_status',
  'action_successor', 'nested_choice_accepted', 'nested_action_closed',
  'selection_input_applied', 'room_entered', 'purchase_result', 'game_action_started',
- 'game_action_completed', 'unavailable_attempt', 'continuity_boundary',
+ 'game_action_completed', 'engine_notification', 'unavailable_attempt', 'continuity_boundary',
  'unmapped_action', 'unmapped_ui_input', 'recording_error', 'observer_error',
  'observer_error_at_input', 'hook_error', 'unmatched_purchase_outcome',
  'unmatched_semantic_callback',
@@ -26,6 +26,33 @@ def action_binding_review(seq, action_id):
  else:
   return None
  return {'sourceActionSequence':seq,'actionId':action_id,'reason':reason}
+
+def notification_issues(rows, actions):
+ issues=[];groups={}
+ rows=[r for r in rows if isinstance(r,dict) and isinstance(r.get('data'),dict) and type(r.get('eventSequence')) is int]
+ for row in rows:
+  if row.get('kind')=='engine_notification':
+   ident=row['data'].get('notificationSequence')
+   if type(ident) is not int or ident<=0:
+    issues.append('invalid internal notification sequence');continue
+   groups.setdefault(ident,[]).append(row)
+ for ident,pair in groups.items():
+  d=pair[0]['data'];parent_seq=d.get('parentActionSequence')
+  parent=actions.get(parent_seq) if type(parent_seq) is int else None
+  returns=[r for r in rows if r.get('kind')=='action_status' and parent
+           and r.get('actionSequence')==parent['actionSequence'] and r['data'].get('status')=='callback_returned']
+  if (type(ident) is not int or ident<=0 or len(pair)!=2
+      or [r['data'].get('status') for r in pair]!=['callback_entered','callback_returned']
+      or d.get('actionId')!='next_act' or d.get('role')!='engine_notification'
+      or d.get('source')!='RunReplays.ActChangeSynchronizer.SetLocalPlayerReady'
+      or d.get('attributionRevision')!='callback-scope-v1' or d.get('relation')!='synchronous_callback'
+      or not parent or parent['data'].get('actionId')!='proceed'
+      or parent['data'].get('source')!='NClickableControl.OnReleaseHandler'
+      or len(returns)!=1 or not parent['eventSequence']<pair[0]['eventSequence']<pair[-1]['eventSequence']<returns[0]['eventSequence']
+      or any(r.get('actionSequence') is not None or r.get('rootRunId')!=parent.get('rootRunId')
+             or {k:v for k,v in r['data'].items() if k!='status'}!={k:v for k,v in d.items() if k!='status'} for r in pair)):
+   issues.append(f'internal notification {ident} lacks a complete synchronous Proceed parent')
+ return issues
 
 def _has_empty_hand_confirmation(choice,candidates,statuses):
  # A real zero-card result plus its delivered confirmation is an input, not a missing click.
@@ -86,6 +113,7 @@ def export(session,output):
  if len(roots)>1:problems.append('multiple run segments; never concatenate for strict replay')
  if not actions:problems.append('no human run actions recorded yet')
  if not any(isinstance(r,dict) and r.get('kind')=='ready' for r in rows) or not any(isinstance(r,dict) and r.get('kind')=='run_started' for r in rows):problems.append('missing recorder readiness or run provenance')
+ problems.extend(notification_issues(rows,actions))
  out=[];rejected=[];adapters=[]
  if list(actions)!=list(range(1,len(actions)+1)):problems.append('action sequence gap or reordered actions')
  previous_choice_event=0
@@ -111,7 +139,7 @@ def export(session,output):
   binding=action_binding_review(seq,d['actionId'])
   if binding:adapters.append(binding)
   if not obs or d['actionId'] not in [a['id'] for a in obs['actions']]:problems.append(f'action {seq} unavailable in recorded observation');continue
-  out.append({'kind':'submit','utc':row['utc'],'actionId':d['actionId'],'controller':'computer_use_debug' if debug_mode else 'human_gui','reason':'recorded original callback; see raw status lifecycle','sourceActionSequence':seq,'sourceRootRunId':row['rootRunId'],'observation':{'processRunId':row['processRunId'],'decisionId':row['decisionId'],**obs}})
+  out.append({'kind':'submit','utc':row['utc'],'actionId':d['actionId'],'controller':'computer_use_debug' if debug_mode else 'human_gui','reason':'recorded original callback; see raw status lifecycle','sourceActionSequence':seq,'sourceEventSequence':row['eventSequence'],'parentActionSequence':d.get('parentActionSequence'),'role':d.get('role','nested_input' if d.get('parentActionSequence') is not None else 'player_input'),'sourceRootRunId':row['rootRunId'],'observation':{'processRunId':row['processRunId'],'decisionId':row['decisionId'],**obs}})
  # Proposed commands stay explicitly non-certifying; consumers must read conversion.json first.
  (output/'commands.proposed.jsonl').write_text(''.join(json.dumps(r,ensure_ascii=False)+'\n' for r in out))
  (output/'successors.jsonl').write_text(''.join(json.dumps(r,ensure_ascii=False)+'\n' for r in successors.values()))

@@ -132,3 +132,7 @@ The session exporter copies event files and metadata. Transfer `initial-profile/
 ## License
 
 [MIT](../LICENSE), with [recorder attribution](src/ATTRIBUTION.md) and [third-party notices](../NOTICE.md).
+
+### Callback metadata awaiting Mac validation
+
+The repair source uses recorder revision 0.2.4 to record synchronous cross-act notifications and their Proceed parent. `engine_notification` retains callback entry/return evidence without increasing the player-input count; real nested selections remain inputs. The v2 export report implementation is retained, with structural checks added for the new notification. Source compiles offline against pinned Linux reference assemblies. Native arm64 build and GUI validation remain required, including a cross-act Proceed, callback cleanup after failure/exit, and nested card selections. The released DLL remains 0.2.3; no asset has been republished.

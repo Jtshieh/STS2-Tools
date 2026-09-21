@@ -46,6 +46,8 @@ public sealed partial class Observer
     private readonly Dictionary<long,ActionRecord> active=new();
     private readonly Dictionary<GameAction,long> executing=new(ReferenceEqualityComparer.Instance);
     private readonly List<long> awaiting=new();
+    private long notificationSequence;
+    private readonly Dictionary<long,long> notificationParents=new();
     internal sealed class ActionRecord {public long Seq;public string Id="",Kind="";public double Started;public bool Nested;public bool HasSuccessor;public bool Delivered,Rejected,NestedResolved,OutcomePending;public string Before="",StartPhase="",StartContext="",NestedContext="",NestedObservation="";public long RoomEpoch;}
     internal Observer()
     {
@@ -57,7 +59,7 @@ public sealed partial class Observer
         Directory.CreateDirectory(logRoot);
         if(OperatingSystem.IsMacOS())File.SetUnixFileMode(logRoot,UnixFileMode.UserRead|UnixFileMode.UserWrite|UnixFileMode.UserExecute);
         stream=new FileStream(Path.Combine(logRoot,"actions.jsonl"),FileMode.CreateNew,FileAccess.Write,FileShare.Read,4096,FileOptions.WriteThrough);
-        Write("recorder_initialized",new{schema="sts2-gui-semantic-v1",recorderRevision="0.2.3",observationRevision="card-state-v2",recorderSha256=Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(typeof(Entry).Assembly.Location))).ToLowerInvariant(),upstream="RunReplays@b0d2302ee69bf2ad735e0b6b51aea02408e9ef62",runtime=System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,architecture=System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString(),assemblySha256=Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(Game.Location))).ToLowerInvariant(),userData=ProjectSettings.GlobalizePath("user://"),cwd=Environment.CurrentDirectory,launchMode=expected==null?"drop_in_mod":"isolated_launcher",userDataIsolationVerified=expected!=null,slVerified=false});
+        Write("recorder_initialized",new{schema="sts2-gui-semantic-v1",recorderRevision="0.2.4",attributionRevision="callback-scope-v1",observationRevision="card-state-v2",recorderSha256=Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(typeof(Entry).Assembly.Location))).ToLowerInvariant(),upstream="RunReplays@b0d2302ee69bf2ad735e0b6b51aea02408e9ef62",runtime=System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,architecture=System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString(),assemblySha256=Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(Game.Location))).ToLowerInvariant(),userData=ProjectSettings.GlobalizePath("user://"),cwd=Environment.CurrentDirectory,launchMode=expected==null?"drop_in_mod":"isolated_launcher",userDataIsolationVerified=expected!=null,slVerified=false});
         if(expected!=null&&Path.GetFullPath(ProjectSettings.GlobalizePath("user://")).TrimEnd('/')!=Path.GetFullPath(expected).TrimEnd('/'))throw new InvalidDataException("User-data isolation mismatch");
         GD.Print("STS2 RECORDER LOGS: "+logRoot);
         AppDomain.CurrentDomain.ProcessExit+=(_,_)=>{try{Write("process_exit",new{continuity="interrupted_or_unverified",pending=active.Keys.ToArray()});stream.Dispose();}catch{}};
@@ -80,7 +82,7 @@ public sealed partial class Observer
     internal void Install()
     {
         var h=new Harmony("owner.sts2.passive.recorder");
-        Patch(h,"NClickableControl","OnReleaseHandler",nameof(Hooks.ClickPrefix),nameof(Hooks.Delivered),nameof(Hooks.Fault));
+        Patch(h,"NClickableControl","OnReleaseHandler",nameof(Hooks.ClickPrefix),nameof(Hooks.Delivered),nameof(Hooks.ClickFault));
         Patch(h,"NCardHolder","EmitPressed",nameof(Hooks.HolderPrefix),nameof(Hooks.Delivered),nameof(Hooks.Fault));
         Patch(h,"NCardHolder","OnMouseReleased",nameof(Hooks.HolderReleasePrefix),nameof(Hooks.Delivered),nameof(Hooks.Fault));
         Patch(h,"NPlayerHand","SelectCardInSimpleMode",nameof(Hooks.HandSemanticPrefix),nameof(Hooks.HandApplied),nameof(Hooks.Fault));
@@ -95,7 +97,7 @@ public sealed partial class Observer
         Patch(h,"RestSiteSynchronizer","ChooseLocalOption",nameof(Hooks.RestPrefix),nameof(Hooks.Accepted),nameof(Hooks.Fault));
         Patch(h,"MerchantEntry","InvokePurchaseCompleted",postfix:nameof(Hooks.PurchaseCompleted));
         Patch(h,"MerchantEntry","InvokePurchaseFailed",postfix:nameof(Hooks.PurchaseFailed));
-        Patch(h,"ActChangeSynchronizer","SetLocalPlayerReady",nameof(Hooks.ActPrefix),nameof(Hooks.Accepted),nameof(Hooks.Fault));
+        Patch(h,"ActChangeSynchronizer","SetLocalPlayerReady",nameof(Hooks.ActPrefix),nameof(Hooks.ActAccepted),nameof(Hooks.ActFault));
         Patch(h,"RunManager","SetUpSavedSingleplayer",nameof(Hooks.LoadPrefix));
         var ctor=typeof(ActionExecutor).GetConstructors(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic).Single(c=>c.GetParameters().Length==1&&c.GetParameters()[0].ParameterType==typeof(ActionQueueSet));
         h.Patch(ctor,postfix:new HarmonyMethod(typeof(Hooks),nameof(Hooks.Executor)));Write("hook_registered",new{type="ActionExecutor",name=".ctor",token=ctor.MetadataToken});
@@ -155,9 +157,30 @@ public sealed partial class Observer
             var parent=active.Values.LastOrDefault(x=>x.Nested)?.Seq;active[seq]=a;awaiting.Add(seq);dirty=true;
             if(choice==null&&!knownAttempt){everIncomplete=true;Write("unmapped_action",new{actionId=id,source,detail,reason="not in current Linux-compatible legal choices",trajectory="incomplete"},seq);}
             if(choice==null&&knownAttempt)Write("unavailable_attempt",new{actionId=id,source,detail,available=false,meaning="preserved human attempt; await original rejection or acceptance"},seq);
-            Write("action_initiated",new{actionId=id,kind=a.Kind,source,detail,parentActionSequence=parent,choice,observation=before},seq);return seq;
+            Write("action_initiated",new{actionId=id,kind=a.Kind,source,detail,parentActionSequence=parent,role=parent==null?"player_input":"nested_input",choice,observation=before},seq);return seq;
         }
         catch(Exception e){Error("recording_error",e);return 0;}
+    }
+    internal long BeginAct(long parent)
+    {
+        // Only the currently executing original click callback proves synchronous ownership.
+        // A pending nested choice or a nearby observation is not a callback parent.
+        if(parent<=0||!active.TryGetValue(parent,out var a)||a.Id!="proceed"||a.HasSuccessor)
+            return Begin("next_act","RunReplays.ActChangeSynchronizer.SetLocalPlayerReady");
+        long id=++notificationSequence;notificationParents.Add(id,parent);
+        ActNotification(id,parent,"callback_entered",null);return -id;
+    }
+    private void ActNotification(long id,long parent,string status,Exception? error)
+        =>Write("engine_notification",new{notificationSequence=id,actionId="next_act",role="engine_notification",
+            source="RunReplays.ActChangeSynchronizer.SetLocalPlayerReady",attributionRevision="callback-scope-v1",
+            relation="synchronous_callback",parentActionSequence=parent,status,error=error?.ToString()});
+    internal void EndAct(long state,Exception? error)
+    {
+        if(state>=0){State(state,error==null?"accepted_into_original_queue":"failed",error);return;}
+        long id=-state;
+        if(!notificationParents.Remove(id,out long parent))throw new InvalidDataException("Missing internal notification parent");
+        ActNotification(id,parent,error==null?"callback_returned":"failed",error);
+        if(error!=null)everIncomplete=true;
     }
     internal long Bound(Node n,string source)
     {
@@ -278,13 +301,23 @@ public sealed partial class Observer
 public static class Hooks
 {
     private static Observer? R=>Entry.Recorder;
+    [ThreadStatic] private static Stack<long>? clickScopes;
     public static void EventPrefix(int index,out long __state)=>__state=Safe(()=>R?.Begin("event:"+index,"RunReplays.EventSynchronizer.ChooseLocalOption",reuse:true)??0);
     public static void RestPrefix(out long __state)=>__state=Safe(()=>R?.CurrentSemantic("rest","RunReplays.RestSiteSynchronizer.ChooseLocalOption")??0);
     public static void PurchaseCompleted(object __instance)=>Safe(()=>R?.PurchaseOutcome(__instance,"purchase_completed",null));
     public static void PurchaseFailed(object __instance,object __0)=>Safe(()=>R?.PurchaseOutcome(__instance,"purchase_rejected",__0));
     private static long Safe(Func<long> fn){try{return fn();}catch(Exception e){try{R?.Error("hook_error",e);}catch{}return 0;}}
     private static void Safe(Action fn){try{fn();}catch(Exception e){try{R?.Error("hook_error",e);}catch{}}}
-    public static void ClickPrefix(object __instance,out long __state)=>__state=Safe(()=>(bool)Observer.Field(__instance,"_isPressed")?(R?.Bound((Node)__instance,"NClickableControl.OnReleaseHandler")??0):0);
+    public static void ClickPrefix(object __instance,out long __state)
+    {
+        __state=Safe(()=>(bool)Observer.Field(__instance,"_isPressed")?(R?.Bound((Node)__instance,"NClickableControl.OnReleaseHandler")??0):0);
+        (clickScopes??=new()).Push(__state);
+    }
+    public static void ClickFault(Exception? __exception,long __state)
+    {
+        try{Fault(__exception,__state);}
+        finally{if(clickScopes?.Count>0)clickScopes.Pop();}
+    }
     public static void HolderPrefix(object __instance,out long __state)=>__state=Safe(()=>R?.Bound((Node)__instance,"NCardHolder.EmitPressed")??0);
     public static void HolderReleasePrefix(object __instance,InputEvent __0,out long __state)=>__state=Safe(()=>
         __0 is InputEventMouseButton mouse&&mouse.ButtonIndex==MouseButton.Left&&Observer.Prop(__instance,"CardNode")!=null&&
@@ -300,7 +333,9 @@ public static class Hooks
     public static void CardPrefix(CardModel __instance,Creature? target,out long __state)=>__state=Safe(()=>R?.Card(__instance,target)??0);
     public static void PotionPrefix(PotionModel __instance,Creature? target,out long __state)=>__state=Safe(()=>R?.Potion(__instance,target)??0);
     public static void BuyPrefix(object __instance,out long __state)=>__state=Safe(()=>R?.Buy(__instance)??0);
-    public static void ActPrefix(out long __state)=>__state=Safe(()=>R?.Begin("next_act","RunReplays.ActChangeSynchronizer.SetLocalPlayerReady")??0);
+    public static void ActPrefix(out long __state)=>__state=Safe(()=>R?.BeginAct(clickScopes?.Count>0?clickScopes.Peek():0)??0);
+    public static void ActAccepted(long __state)=>Safe(()=>R?.EndAct(__state,null));
+    public static void ActFault(Exception? __exception,long __state){if(__exception!=null)Safe(()=>R?.EndAct(__state,__exception));}
     public static void ChoicePrefix(Player player,uint choiceId,PlayerChoiceResult result)=>Safe(()=>R?.ChoiceAccepted(player,choiceId,result));
     public static void LoadPrefix()=>Safe(()=>R?.Interrupted("SetUpSavedSingleplayer: resumed segment, SL not verified"));
     public static void Delivered(long __state)=>Safe(()=>R?.State(__state,"callback_returned"));

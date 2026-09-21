@@ -85,6 +85,10 @@ Linux 人工控制器允许等待输入 900 秒。已接受动作有 40 秒到�
 
 回放包包含记录中的命令与观察、种子、起点模式，以及 Continue 的初始存档哈希。材料准备见 [Mac 到 Linux 回放](../docs/REPLAY.zh-CN.md)。不支持的事件和未绑定的 `next_act` 输入会产生导入错误，标识需要适配的部分。
 
+回放包保留 `sourceRaw` 原始字节的 UTF-8 表示、`sourceSha256`、实际 `sourceEventRange`、`sourceActionCount` 和逐项 `transformations`。命令含 `macActionSequence`、`macEventSequence`、`parentActionSequence`、`role` 和 `conversionReason`；`role` 区分 `player_input` 与 `nested_input`。内部 `engine_notification` 只作为证据，不生成 submit。通知必须有 `notificationSequence`、`parentActionSequence`、`attributionRevision=callback-scope-v1`、`relation=synchronous_callback` 及配对的 `callback_entered/callback_returned`，且完整位于原 Proceed 回调内。旧轨迹只允许显式来源绑定的专项适配，见[回放指南](../docs/REPLAY.zh-CN.md#既有跨幕轨迹的专项适配)。
+
+最终比较从实际 `action_response` 读取最后一个后继，验证序号、唯一性及其状态与 `terminal.json` 一致，再比较终点的完整状态和合法动作。Mac 导出的 v2 报告继续区分结构完整性、动作适配要求和未执行的 Linux 回放；导入成功不写入实测通过结论。
+
 ## 回放比较
 
 比较器保留事件选项、奖励、费用、资源、卡牌升级/效果和转场状态。跨进程映射卡牌实例，按身份匹配重排的网格；新出现的奖励卡允许按唯一的完整机械属性匹配，候选有歧义时比较失败。

@@ -33,6 +33,17 @@ def manual_action(obs,proc):
         except (ValueError,AssertionError):print('请输入所列动作编号',flush=True);continue
         return obs['actions'][idx]['id']
 
+def recorded_endpoint(terminal, trajectory, inputs):
+    """Read the already-recorded final successor, including its available actions."""
+    responses = [r['value'] for r in trajectory if r.get('kind') == 'action_response'
+                 and r['value'].get('sequence') == inputs]
+    if len(responses) != 1 or terminal.get('submittedCount') != inputs:
+        raise ValueError('Missing/ambiguous final successor receipt or input count')
+    successor = responses[0]['successor']
+    if successor.get('state') != terminal.get('state') or not isinstance(successor.get('actions'), list):
+        raise ValueError('Terminal differs from recorded final successor')
+    return successor
+
 def main():
     from runtime import configured, stage, command
     import compare_gui
@@ -143,7 +154,8 @@ def main():
             if result:raise RuntimeError(f'Native supervisor exited {result}; inspect private launcher.log')
             terminal=json.loads((evidence/'runtime-work/bridge/terminal.json').read_text())
             if trace:
-                compare(dict(state=trace['endpoint']['state'],actions=[]),dict(state=terminal['state'],actions=[]))
+                trajectory=[json.loads(line) for line in (evidence/'runtime-work/trajectory.jsonl').read_text().splitlines()]
+                compare(trace['endpoint'],recorded_endpoint(terminal,trajectory,index))
                 if index!=len(trace['commands']):raise ValueError('Trace not fully consumed')
                 atomic(receipt/'replay-result.json',dict(mechanicalMatched=True,strictDecisionTimingMatched=all(c['strictMatched'] for c in comparisons),inputs=index,scope='bounded recorded segment; no whole-run fidelity or restart continuity claim'))
     except BaseException as e:

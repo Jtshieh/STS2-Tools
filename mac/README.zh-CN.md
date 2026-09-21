@@ -132,3 +132,7 @@ Continue 在 `prepare.py` 命令中增加 `--current-run '/absolute/path/to/curr
 ## 许可
 
 [MIT](../LICENSE)，[录制器归属说明](src/ATTRIBUTION.md)与[第三方归属](../NOTICE.md)。
+
+### 待 Mac 验证的回调元数据
+
+当前修复源码使用录制器 revision 0.2.4，记录 Proceed 内同步发生的跨幕通知及父动作归属。`engine_notification` 保留回调进入/返回证据，不增加玩家输入计数；真实嵌套选择仍记录为输入。v2 导出报告实现保留，仅增加新通知的结构检查。源码已用固定 Linux 参考程序集离线编译，但仍需原生 arm64 构建和实际 GUI 跨幕验证，包括正常 Proceed、回调异常/退出后归属清理及选牌嵌套输入。现有发布 DLL 仍为0.2.3；未重新发布附件。

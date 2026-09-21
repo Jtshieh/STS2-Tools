@@ -92,6 +92,31 @@ class ExportReport(unittest.TestCase):
         self.assertEqual(report["recordingMode"], "debug_console")
         self.assertEqual(report["linuxReplay"]["status"], "not_applicable")
 
+    def test_internal_notification_retains_v2_report_contract(self):
+        rows=recording('proceed');rows[3]['data']['source']='NClickableControl.OnReleaseHandler'
+        notice=dict(actionId='next_act',role='engine_notification',notificationSequence=1,
+                    source='RunReplays.ActChangeSynchronizer.SetLocalPlayerReady',error=None,
+                    attributionRevision='callback-scope-v1',relation='synchronous_callback',parentActionSequence=1)
+        events=[dict(rows[3],kind='engine_notification',actionSequence=None,data=dict(notice,status=status))
+                for status in ['callback_entered','callback_returned']]
+        rows[4:4]=events
+        for i,r in enumerate(rows,1):r['eventSequence']=i
+        report,commands=self.run_export(rows)
+        self.assertTrue(report['structuralReady'])
+        self.assertEqual(report['schema'],'sts2-gui-conversion-v2')
+        self.assertEqual([c['actionId'] for c in commands],['proceed'])
+        self.assertEqual(report['requiredActionBindings'],[])
+        self.assertEqual(report['observationComparison']['status'],'not_run')
+        self.assertEqual(report['linuxReplay']['status'],'not_run')
+        rows[4]['data']['parentActionSequence']=None
+        report,_=self.run_export(rows)
+        self.assertFalse(report['structuralReady'])
+        self.assertTrue(any('synchronous Proceed parent' in x for x in report['issues']))
+        rows[4]['data']['notificationSequence']=[]
+        report,_=self.run_export(rows)
+        self.assertFalse(report['structuralReady'])
+        self.assertIn('invalid internal notification sequence',report['issues'])
+
     def test_malformed_event_is_reported(self):
         report, _ = self.run_export(recording() + [None])
         self.assertFalse(report["structuralReady"])

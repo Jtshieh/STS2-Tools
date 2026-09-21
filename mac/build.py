@@ -40,7 +40,7 @@ def main():
         dll = build / 'bin/Release/net9.0/Sts2Recorder.dll'
         shutil.copyfile(dll, mods / dll.name)
         write_json(mods / 'Sts2Recorder.json', dict(id='Sts2Recorder', name='STS2 Passive Recorder',
-            author='Jtshieh; hooks derived from boardengineer/RunReplays (MIT)', version='0.2.3',
+            author='Jtshieh; hooks derived from boardengineer/RunReplays (MIT)', version='0.2.4',
             description='Passive semantic recorder; no automated decisions.', has_pck=False,
             has_dll=True, affects_gameplay=False, dependencies=[]))
         write_json(private / 'build.json', dict(sdkVersion=version, recorderSha256=digest(dll),

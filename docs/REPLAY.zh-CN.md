@@ -68,10 +68,20 @@ python3 -B scripts/sts2_play.py \
 
 ## 处理录制边界
 
-导入器要求所选片段具有同一进程/运行身份、连续事件、已接受输入和实际后继。缺失输入、未知 UI 事件或连续性边界会停止导入。记录中的 `next_act` 目前会停止导入，因为父动作归属需要适配；扩展映射前先检查该事件。
+导入器要求所选片段具有同一进程/运行身份、连续事件、已接受输入和实际后继。真实嵌套输入保留为独立命令，父决策须在片段内闭合。未知 UI、缺失输入、失败或片段内的连续性边界仍停止导入。`claim_relic:*` 和 `deselect_hand:*` 尚无对应 Linux Bridge 绑定，明确拒绝；不会映射到第一项或相似动作。
+
+源码录制器 revision 0.2.4 在 Proceed 原始同步回调内，把 `SetLocalPlayerReady` 记录为成对的 `engine_notification`，包含 `callback-scope-v1` 归属、通知序号和父动作序号。导入器验证父回调及通知进入/返回顺序，只执行父 Proceed。父关系不明的旧 `next_act` 仍拒绝。该元数据源码通过 Linux 参考程序集编译；Mac arm64 构建及真实 GUI 验证待完成，既有发布 DLL 未更新。
 
 退菜单、读档和重启后的片段分别处理。Continue 回放包包含 `initial_resume_unverified`，标识读档是该片段的起点边界。
 
 ## 接入自己的工作流
 
 按[轨迹协议](../linux/PROTOCOL.zh-CN.md#导出动作日志)处理 accepted/completed 动作对，或使用 [Linux 战斗样本采集器](../linux/README.zh-CN.md#训练与数据集)。数据处理流程可以为每段示范保留回放结果，据此选择训练样本。
+
+## 既有跨幕轨迹的专项适配
+
+只有2026-09-15已审查的原始轨迹及精确起始存档可使用 `--legacy-adapter mac-20260915-cross-act`。该选项核对完整原始文件 SHA-256 和起始存档 SHA-256；修改后的文件、其他轨迹及 new 起点均拒绝。它根据唯一 Proceed 回调和 Vote 完成证据归属内部通知，不按动作编号硬编码。已审查的查看牌堆、预览和暂停/继续 UI 事件逐项保留转换理由，不能推广到任意未知输入。退出/读档等片段外事件仍保存在原始字节中。
+
+对该完整历史片段，导入时用 `--actions 158 --legacy-adapter mac-20260915-cross-act`，回放时用 `--decisions 157`。`--actions` 计算源 `action_initiated` 事件；`--decisions` 计算导入后实际命令。原始158个发起事件转换为157个输入，38个带父关系的嵌套输入仍执行。导入包保留 `sourceRaw`、源序号、父关系和 `transformations`，属于私有验证材料。
+
+离线验证确认新转换的执行命令和终点与既有证据一致；用保留的 Linux 送达记录核对157个决策和最终状态/合法动作通过。复用19个跨幕后继通过结果，77处 `end_turn` 时机差异仍为严格一致性失败。这不是新的真实游戏或 Mac GUI 验证，也不证明其他轨迹可回放。`replayEvidence.status` 在导入时始终为 `not_run`。
