@@ -11,7 +11,7 @@ Collect human demonstrations while playing STS2 with the mouse. The recorder cap
 | Game | v0.111.0 / 41cef1ea / Steam build 24724944 |
 | Platform | macOS Apple Silicon / arm64 |
 | Gameplay | Single-player Silent A0, using your own progression |
-| Release | v0.1.0-alpha; recorder revision 0.2.3 |
+| Recorder package | v0.1.0-alpha; recorder revision 0.2.3 |
 
 The [Mac manifest](config/) contains platform-specific file hashes.
 
@@ -21,7 +21,7 @@ The [Mac manifest](config/) contains platform-specific file hashes.
 
 | Item | Purpose and access |
 | --- | --- |
-| Precompiled mod | [Download Mac ZIP](https://github.com/Jtshieh/STS2-Tools/releases/download/v0.1.0-alpha/Sts2Recorder-macos-arm64-v0.1.0-alpha.zip). Install `Sts2Recorder.dll` and `Sts2Recorder.json`; retain the included license files. |
+| Precompiled mod | [Download Mac ZIP](https://github.com/Jtshieh/STS2-Tools/releases/download/v0.1.1-alpha/Sts2Recorder-macos-arm64-v0.1.0-alpha.zip). Install `Sts2Recorder.dll` and `Sts2Recorder.json`; retain the included license files. |
 | Recorder source and build script | [src/](src/) and [build.py](build.py), available in the [source ZIP](https://github.com/Jtshieh/STS2-Tools/archive/refs/heads/main.zip). Build or modify the mod locally. |
 | Workspace and export tools | [prepare.py](prepare.py), [launch.py](launch.py), and [export_trace.py](export_trace.py) create a separate game/profile workspace and organize recorded trajectories. |
 | Version configuration | [config/](config/) identifies the compatible Mac game files. |

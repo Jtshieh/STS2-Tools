@@ -1,0 +1,33 @@
+name: Bug report / 问题报告
+description: Report an installation, recording, policy, or replay problem.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Include a minimal reproduction. Replace personal paths and account identifiers with placeholders. Keep game files, saves, credentials, and full gameplay logs local.
+        说明最小复现步骤，替换个人路径和账号身份，游戏文件、存档、凭据及完整游玩日志保留在本地。
+  - type: textarea
+    id: versions
+    attributes:
+      label: Versions and platform / 版本与平台
+      description: Repository release or commit, game version/build, OS, CPU architecture, and relevant toolchain versions.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps / 复现步骤
+      description: Entry point, command with placeholder paths, and steps to reproduce.
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Expected and actual behavior / 预期与实际行为
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostic
+    attributes:
+      label: Redacted diagnostic / 脱敏诊断
+      description: A short error excerpt or synthetic fixture. For replay differences, include the action sequence and differing field names.

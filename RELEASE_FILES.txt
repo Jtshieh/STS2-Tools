@@ -1,5 +1,8 @@
+.github/ISSUE_TEMPLATE/bug_report.yml
 .github/workflows/contracts.yml
 .gitignore
+CONTRIBUTING.md
+CONTRIBUTING.zh-CN.md
 LICENSE
 NOTICE.md
 README.md
@@ -9,6 +12,10 @@ RELEASE_FILES.txt
 VERSION
 docs/REPLAY.md
 docs/REPLAY.zh-CN.md
+examples/README.md
+examples/README.zh-CN.md
+examples/read_trajectory.py
+examples/synthetic-action-log.jsonl
 linux/.gitignore
 linux/LICENSE
 linux/LICENSES/Godot.txt

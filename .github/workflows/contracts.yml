@@ -11,6 +11,7 @@ jobs:
         with:
           persist-credentials: false
       - run: python3 -B scripts/audit_source.py --staged
+      - run: python3 -B examples/read_trajectory.py examples/synthetic-action-log.jsonl
       - run: python3 -B -m unittest discover -s mac/tests -v
       - run: python3 -B -m unittest discover -s tests -v
         working-directory: linux
