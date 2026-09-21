@@ -3,6 +3,30 @@
 from pathlib import Path
 import argparse,json,hashlib,datetime,shutil
 ROOT=Path(__file__).resolve().parent;P=ROOT/'.private'
+# These are capture events, including outcomes that must never become extra inputs.
+KNOWN_EVENTS = {
+ 'recorder_initialized', 'hook_registered', 'ready', 'run_started', 'process_exit',
+ 'menu_input', 'observation', 'observation_wait', 'action_initiated', 'action_status',
+ 'action_successor', 'nested_choice_accepted', 'nested_action_closed',
+ 'selection_input_applied', 'room_entered', 'purchase_result', 'game_action_started',
+ 'game_action_completed', 'unavailable_attempt', 'continuity_boundary',
+ 'unmapped_action', 'unmapped_ui_input', 'recording_error', 'observer_error',
+ 'observer_error_at_input', 'hook_error', 'unmatched_purchase_outcome',
+ 'unmatched_semantic_callback',
+}
+
+def action_binding_review(seq, action_id):
+ # Review requirements for the current Linux adapters, not capture corruption.
+ if action_id == 'next_act':
+  reason='The generic importer rejects next_act; establish parent/input attribution before replay.'
+ elif action_id.startswith('claim_relic:'):
+  reason='The current Linux bridge has no direct claim_relic action; review the original reward callback mapping.'
+ elif action_id.startswith('deselect_hand:'):
+  reason='The current Linux bridge exposes select_hand; review the deselection callback and card identity mapping.'
+ else:
+  return None
+ return {'sourceActionSequence':seq,'actionId':action_id,'reason':reason}
+
 def _has_empty_hand_confirmation(choice,candidates,statuses):
  # A real zero-card result plus its delivered confirmation is an input, not a missing click.
  d=choice['data'];selected=d.get('selected',{})
@@ -25,7 +49,6 @@ def export(session,output):
  launch=json.loads((session/'launch.json').read_text()) if (session/'launch.json').exists() else {}
  debug_mode=launch.get('recordingMode')=='debug_console' or (session/'debug-interventions.private.jsonl').exists()
  rows=[];problems=[]
- if debug_mode:problems.append('debug console/999-block fixture: gameplay changed; never certify as ordinary continuous replay')
  raw=session/'actions.jsonl'
  if not raw.exists():problems.append('recorder did not initialize')
  else:
@@ -34,8 +57,15 @@ def export(session,output):
   for n,line in enumerate(captured.splitlines(),1):
    try:rows.append(json.loads(line))
    except ValueError:problems.append(f'truncated/invalid JSON line {n}')
- expected=1;actions={};successors={};statuses={};roots=set();nested_closed=set();nested_results=[]
+ expected=1;actions={};successors={};statuses={};roots=set();processes=set();nested_closed=set();nested_results=[]
  for row in rows:
+  if (not isinstance(row,dict) or row.get('schema')!='sts2-gui-semantic-v1'
+      or type(row.get('eventSequence')) is not int or not isinstance(row.get('kind'),str)
+      or not isinstance(row.get('data'),dict) or not row.get('processRunId')):
+   problems.append('invalid semantic event envelope');continue
+  processes.add(row['processRunId'])
+  if row['kind'] not in KNOWN_EVENTS:problems.append(f'unknown event kind {row["kind"]} at event {row["eventSequence"]}')
+  if row['data'].get('error'):problems.append(f'event error at event {row["eventSequence"]}')
   if row['eventSequence']!=expected:problems.append(f'event sequence gap at {expected}')
   expected=row['eventSequence']+1
   kind=row['kind'];seq=row.get('actionSequence')
@@ -52,9 +82,10 @@ def export(session,output):
   if kind in ['unmapped_action','recording_error','observer_error','observer_error_at_input','hook_error','unmatched_purchase_outcome','unmatched_semantic_callback']:problems.append(f'{kind} at event {row["eventSequence"]}')
   if kind=='unmapped_ui_input':problems.append(f'unclassified UI input at event {row["eventSequence"]}; review before strict replay')
   if kind=='continuity_boundary':problems.append('continuity boundary: '+row['data']['reason'])
+ if len(processes)>1:problems.append('multiple process identities in one recording')
  if len(roots)>1:problems.append('multiple run segments; never concatenate for strict replay')
  if not actions:problems.append('no human run actions recorded yet')
- if not any(r['kind']=='ready' for r in rows) or not any(r['kind']=='run_started' for r in rows):problems.append('missing recorder readiness or run provenance')
+ if not any(isinstance(r,dict) and r.get('kind')=='ready' for r in rows) or not any(isinstance(r,dict) and r.get('kind')=='run_started' for r in rows):problems.append('missing recorder readiness or run provenance')
  out=[];rejected=[];adapters=[]
  if list(actions)!=list(range(1,len(actions)+1)):problems.append('action sequence gap or reordered actions')
  previous_choice_event=0
@@ -77,8 +108,9 @@ def export(session,output):
    rejected.append({'sourceActionSequence':seq,'actionId':d['actionId'],'statuses':states,'unchangedObservation':unchanged,'original':row})
    if not unchanged:problems.append(f'rejected purchase {seq} lacks an identical next observation; manual review required')
    continue
+  binding=action_binding_review(seq,d['actionId'])
+  if binding:adapters.append(binding)
   if not obs or d['actionId'] not in [a['id'] for a in obs['actions']]:problems.append(f'action {seq} unavailable in recorded observation');continue
-  if d['actionId'].startswith(('claim_relic:','deselect_hand:','next_act')):adapters.append({'sourceActionSequence':seq,'actionId':d['actionId']})
   out.append({'kind':'submit','utc':row['utc'],'actionId':d['actionId'],'controller':'computer_use_debug' if debug_mode else 'human_gui','reason':'recorded original callback; see raw status lifecycle','sourceActionSequence':seq,'sourceRootRunId':row['rootRunId'],'observation':{'processRunId':row['processRunId'],'decisionId':row['decisionId'],**obs}})
  # Proposed commands stay explicitly non-certifying; consumers must read conversion.json first.
  (output/'commands.proposed.jsonl').write_text(''.join(json.dumps(r,ensure_ascii=False)+'\n' for r in out))
@@ -88,18 +120,41 @@ def export(session,output):
   if (session/name).exists():shutil.copyfile(session/name,output/name)
  for name in ['profile-input-manifest.json','harmony-path-patch.json','game-manifest.json']:
   if (P/name).exists():shutil.copyfile(P/name,output/name)
- report={'schema':'sts2-gui-conversion-v1','source':str(session),'actions':len(actions),'proposedCommands':len(out),'roots':sorted(roots),'issues':problems,'structuralReady':bool(actions) and not problems,'recordingMode':'debug_console' if debug_mode else 'normal','crossPlatformFidelity':'not applicable to unmodified gameplay' if debug_mode else 'not tested','requiredLinuxAdaptation':['Use same original progression hashes and Standard Silent A0; seed is in private replay input.','Replay commands.proposed.jsonl using the existing action interface; stop on the first unmatched observation or unavailable action.','Current Linux replay ending expects Linux runtime.json and terminal.json. Add GUI trace end/successor validation; never use --mode auto to fill a missing suffix.','Only the existing initial Neow greeting normalization is allowed. All other observations, options, rewards and state differences remain failures.','next_act and GUI potion-menu/treasure variants may require Linux action bindings; retain unsupported input as an explicit stop.']}
- observation_v2=any(r['kind']=='recorder_initialized' and r.get('data',{}).get('observationRevision')=='card-state-v2' for r in rows)
- if observation_v2:
-  report['requiredObservationBindings']=['cardDetails.state: affliction and enchantment ids/amounts/display amounts, current upgrade, dynamic keywords, Wither visible scaling', 'status.deckCards and hand/choice/result cardDetails: map recorder_process instance ids bijectively to Linux card objects using actual actions and positions; never match by model id alone', 'visible powers: Surrounded facing, Flanking applierCombatId, Sandpit targetCombatId; map creature identities', 'cardDetails.rendered: displayed description/title/lock state. Classify only proven display differences; do not drop mechanical numbers or effects.']
-  report['structuralReady']=False
-  report['issues'].append('card-state-v2 observation mapping has not been validated on Linux; do not strip the new fields to obtain agreement')
- report.update({'rejectedAttempts':len(rejected),'requiredActionBindings':adapters,'capturedEvents':len(rows),'lastEventSequence':rows[-1]['eventSequence'] if rows else None})
- if adapters:
-  report['structuralReady']=False
-  report['issues'].append('Recorded actions require explicit Linux bindings; see requiredActionBindings')
+ revisions=sorted({r['data']['observationRevision'] for r in rows
+   if isinstance(r,dict) and r.get('kind')=='recorder_initialized'
+   and isinstance(r.get('data'),dict) and isinstance(r['data'].get('observationRevision'),str)})
+ report={
+  'schema':'sts2-gui-conversion-v2','source':str(session),
+  'actions':len(actions),'proposedCommands':len(out),'roots':sorted(roots),
+  'issues':problems,'structuralReady':bool(actions) and not problems,
+  'recordingMode':'debug_console' if debug_mode else 'normal',
+  'crossPlatformFidelity':'not applicable to unmodified gameplay' if debug_mode else 'not tested',
+  'requiredActionBindings':adapters,
+  'requiredLinuxAdaptation':[a['reason'] for a in adapters],
+  'observationComparison':{
+   'revisions':revisions,'status':'not_run',
+   'comparator':'linux/scripts/compare_gui.py',
+   'instruction':'Compare the recorded fields and card identities with Linux observations using the current comparator.'},
+  'linuxReplay':{
+   'status':'not_applicable' if debug_mode else 'not_run',
+   'reason':'Debug interventions changed gameplay.' if debug_mode else 'Export does not execute Linux import or replay.',
+   'input':'actions.raw.jsonl','importer':'linux/scripts/import_trace.py',
+   'runner':'linux/scripts/sts2_play.py'},
+  'replayInstructions':[
+   'Prepare matching game/profile inputs and the recorded seed; Continue requires the exact starting run save.',
+   'Import actions.raw.jsonl with linux/scripts/import_trace.py, then use sts2_play.py --mode replay.',
+   'The Linux runner compares decision observations and the recorded endpoint. Read its replay-result.json for mechanical and decision-timing results.',
+   'Use the current comparator and protocol for display normalization; preserve mechanical state, rewards, options and card effects.'],
+  'rejectedAttempts':len(rejected),'capturedEvents':len(rows),
+  'lastEventSequence':rows[-1].get('eventSequence') if rows and isinstance(rows[-1],dict) else None,
+ }
  (output/'conversion.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
- (output/'README.txt').write_text('PRIVATE — keep on the owner Mac / approved Linux project.\nRead conversion.json before replay. commands.proposed.jsonl is NOT proof of accepted/complete/fidelity-passing gameplay. Raw failures and boundaries are preserved. GUI pre-observations extend the Linux state/actions projection; card-state-v2 requires explicit mapping and comparison of card effects and local identities. Per-action successors are separate; no checkpoint-guided inference.\n')
+ (output/'README.txt').write_text(
+  'Read conversion.json before processing this private export.\n'
+  'sts2-gui-conversion-v2: structuralReady describes capture completeness; issues lists capture/continuity problems.\n'
+  'requiredActionBindings lists adapter reviews separately. observationComparison and linuxReplay record that export has not run comparison/replay.\n'
+  'Import actions.raw.jsonl with linux/scripts/import_trace.py. The Linux replay runner compares decisions and the endpoint.\n'
+  'commands.proposed.jsonl contains preprocessing candidates. Original events, failed attempts and boundaries remain in the export.\n')
  (output/'SHA256SUMS').write_text(''.join(hashlib.sha256(f.read_bytes()).hexdigest()+'  '+f.name+'\n' for f in sorted(output.iterdir()) if f.is_file()))
  return report
 if __name__=='__main__':

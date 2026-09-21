@@ -77,7 +77,7 @@ python3 -B mac/export_trace.py \
 | `conversion.json` | Event counts, continuity/recording issues, and mappings requiring review. |
 | `SHA256SUMS` | Hashes of the exported files. |
 
-For imitation learning, pair each input's observation with its recorded choice and check delivery and successor events. Use `conversion.json` when filtering or labeling samples. A selection input and its final selection result describe different stages of the same interaction; count the input as the decision. The exporter's proposed mappings and `structuralReady` field are preprocessing diagnostics. Use the Linux replay result for cross-platform comparison.
+For imitation learning, pair each input's observation with its recorded choice and check delivery and successor events. Use `conversion.json` when filtering or labeling samples. A selection input and its final selection result describe different stages of the same interaction; count the input as the decision. `conversion.json` uses `sts2-gui-conversion-v2`: `structuralReady` and `issues` describe capture structure and continuity, while `requiredActionBindings` lists action-adapter reviews separately. `observationComparison.status` and `linuxReplay.status` are `not_run` at export; debug-intervention recordings use `not_applicable` for replay. Use the Linux replay result for cross-platform comparison.
 
 Continue with [Mac-to-Linux replay](../docs/REPLAY.md) or the [trajectory protocol](../linux/PROTOCOL.md) to build your own processing pipeline.
 

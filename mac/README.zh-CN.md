@@ -77,7 +77,7 @@ python3 -B mac/export_trace.py \
 | `conversion.json` | 事件数量、连续性/录制问题，以及需要审查的映射。 |
 | `SHA256SUMS` | 导出文件哈希。 |
 
-用于模仿学习时，将每个输入的观察与实际选择配对，并检查送达和后继事件。筛选或标注样本时参考 `conversion.json`。选牌输入与最终选牌结果描述同一次交互的不同阶段，应将输入计为决策。导出的候选映射和 `structuralReady` 字段用于预处理诊断；跨平台比较以 Linux 回放结果为准。
+用于模仿学习时，将每个输入的观察与实际选择配对，并检查送达和后继事件。筛选或标注样本时参考 `conversion.json`。选牌输入与最终选牌结果描述同一次交互的不同阶段，应将输入计为决策。`conversion.json` 使用 `sts2-gui-conversion-v2`：`structuralReady` 和 `issues` 只描述录制结构与连续性，`requiredActionBindings` 单独列出动作适配审查项。`observationComparison.status` 与 `linuxReplay.status` 在导出时为 `not_run`；调试干预记录的回放状态为 `not_applicable`。跨平台比较以 Linux 回放结果为准。
 
 后续流程见 [Mac 到 Linux 回放](../docs/REPLAY.zh-CN.md)，自建数据处理流程可参考[轨迹协议](../linux/PROTOCOL.zh-CN.md)。
 

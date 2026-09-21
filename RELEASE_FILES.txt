@@ -91,5 +91,6 @@ mac/src/Observation.cs
 mac/src/Recorder.cs
 mac/src/Recorder.csproj
 mac/src/RunReplays-LICENSE
+mac/tests/test_export_report.py
 mac/tests/test_setup.py
 scripts/audit_source.py
