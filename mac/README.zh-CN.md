@@ -21,7 +21,7 @@
 
 | 内容 | 用途与获取入口 |
 | --- | --- |
-| mod 预编译包 | [下载 Mac ZIP](https://github.com/Jtshieh/STS2-Tools/releases/download/v0.1.1-alpha/Sts2Recorder-macos-arm64-v0.1.0-alpha.zip)。安装 `Sts2Recorder.dll` 和 `Sts2Recorder.json`，保留包内许可文件。 |
+| mod 预编译包 | [下载 Mac ZIP](https://github.com/Jtshieh/STS2-Tools/releases/download/v0.1.2-alpha/Sts2Recorder-macos-arm64-v0.1.0-alpha.zip)。安装 `Sts2Recorder.dll` 和 `Sts2Recorder.json`，保留包内许可文件。 |
 | 录制器源码与构建脚本 | [src/](src/) 和 [build.py](build.py)，也可从[源码 ZIP](https://github.com/Jtshieh/STS2-Tools/archive/refs/heads/main.zip) 获取，用于本地构建或修改 mod。 |
 | 工作区与导出工具 | [prepare.py](prepare.py)、[launch.py](launch.py) 和 [export_trace.py](export_trace.py)，用于创建独立游戏/profile 工作区和整理轨迹。 |
 | 版本配置 | [config/](config/) 标识兼容的 Mac 游戏文件。 |

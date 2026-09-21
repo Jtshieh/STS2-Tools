@@ -32,7 +32,7 @@ flowchart LR
 
 ## Compatibility
 
-| Item | v0.1.1-alpha |
+| Item | v0.1.2-alpha |
 | --- | --- |
 | Game | STS2 **v0.111.0**, commit **41cef1ea**, Steam build **24724944** |
 | Linux | x86_64; reference host Ubuntu 24.04.5 |
@@ -48,7 +48,7 @@ Platform-specific versions and file hashes are in [linux/config](linux/config/) 
 | Item | Purpose and access |
 | --- | --- |
 | Source code | [Download source ZIP](https://github.com/Jtshieh/STS2-Tools/archive/refs/heads/main.zip) or clone this repository to build, extend, or inspect the tools. |
-| Precompiled Mac mod | [Download recorder ZIP](https://github.com/Jtshieh/STS2-Tools/releases/download/v0.1.1-alpha/Sts2Recorder-macos-arm64-v0.1.0-alpha.zip) to record gameplay. Includes the recorder DLL, mod manifest, and license files. |
+| Precompiled Mac mod | [Download recorder ZIP](https://github.com/Jtshieh/STS2-Tools/releases/download/v0.1.2-alpha/Sts2Recorder-macos-arm64-v0.1.0-alpha.zip) to record gameplay. Includes the recorder DLL, mod manifest, and license files. |
 | Linux tools | [linux/](linux/) contains preparation, build, play, trajectory export, and replay entry points. Build locally against your game. |
 | Configuration and examples | [Linux configuration](linux/config/), [Mac configuration](mac/config/), the [policy example](linux/scripts/sts2_policy.py), and [learning example](linux/scripts/sts2_train.py) provide version manifests and integration starting points. |
 
@@ -73,7 +73,7 @@ Use the [observation and action protocol](linux/PROTOCOL.md) to connect a custom
 
 ## Start with human demonstrations
 
-Download the [Mac mod ZIP](https://github.com/Jtshieh/STS2-Tools/releases/download/v0.1.1-alpha/Sts2Recorder-macos-arm64-v0.1.0-alpha.zip), place `Sts2Recorder.dll` and `Sts2Recorder.json` in `SlayTheSpire2.app/Contents/MacOS/mods/`, and launch the game. The main menu displays `RECORDER READY` and the session's log directory.
+Download the [Mac mod ZIP](https://github.com/Jtshieh/STS2-Tools/releases/download/v0.1.2-alpha/Sts2Recorder-macos-arm64-v0.1.0-alpha.zip), place `Sts2Recorder.dll` and `Sts2Recorder.json` in `SlayTheSpire2.app/Contents/MacOS/mods/`, and launch the game. The main menu displays `RECORDER READY` and the session's log directory.
 
 Follow [Mac recording and export](mac/README.md), then [replay the trajectory on Linux](docs/REPLAY.md) or process its decision observations and human choices in your own dataset pipeline.
 
