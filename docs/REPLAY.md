@@ -70,17 +70,15 @@ Mouse dragging can change when `end_turn` is exposed. To study this specific tim
 
 The importer requires one process/run identity, consecutive events, accepted inputs, and actual successors. Real nested inputs remain separate commands, and their parent decisions must close within the selected segment. Unknown UI inputs, missing inputs, failures, or a continuity boundary inside the segment stop import. `claim_relic:*` and `deselect_hand:*` still lack matching Linux Bridge bindings and are rejected.
 
-Source recorder revision 0.2.4 records `SetLocalPlayerReady` inside an original synchronous Proceed callback as paired `engine_notification` events, with `callback-scope-v1` attribution, a notification sequence, and the parent action sequence. The importer verifies callback entry/return ordering and executes only the parent Proceed. Old `next_act` events without reliable attribution remain rejected. The metadata source compiles against Linux reference assemblies; native Mac arm64 build and GUI validation remain pending. Existing released DLLs are unchanged.
+Source recorder revision 0.2.4 records `SetLocalPlayerReady` inside an original synchronous Proceed callback as paired `engine_notification` events, with `callback-scope-v1` attribution, a notification sequence, and the parent action sequence. The importer verifies callback entry/return ordering and executes only the parent Proceed. Old `next_act` events without reliable attribution remain rejected. Recorder revision 0.2.4 is included in the current Mac package.
 
 Treat segments after a menu return, load, or restart as separate recordings. Continue bundles carry `initial_resume_unverified`, identifying the load as their starting boundary.
 
-## Adapt the retained cross-act recording
+## Legacy recordings
 
-Only the reviewed 2026-09-15 raw recording and its exact starting save can use `--legacy-adapter mac-20260915-cross-act`. The option checks the complete raw-file SHA-256 and starting-save SHA-256; edited files, other recordings, and new-run starts are rejected. It derives notification ownership from a unique Proceed callback and its completed Vote evidence, without hardcoded action numbers. Reviewed pile-view, preview, and pause/resume UI events retain individual conversion reasons. These exceptions do not apply to unknown inputs in other traces. Out-of-segment load and exit events remain in the original bytes.
+`--legacy-adapter mac-20260915-cross-act` is a compatibility option for one retained regression recording. It requires the exact raw-file and starting-save hashes declared in [the importer](../linux/scripts/import_trace.py). It preserves the raw events and records each transformation and parent relationship. Use the default importer for your own recordings.
 
-For the complete historical segment, import with `--actions 158 --legacy-adapter mac-20260915-cross-act`, then replay with `--decisions 157`. `--actions` counts source `action_initiated` events; `--decisions` counts imported executable commands. The 158 initiated events yield 157 inputs, retaining all 38 nested inputs with parent relationships. The bundle preserves `sourceRaw`, source sequences, parent relationships, and `transformations` as private validation data.
-
-Offline validation confirms that converted commands and the endpoint equal the retained evidence. Comparison against the retained Linux delivery records passes for 157 decisions and the final state/action list. The 19 previously verified cross-act successors are reused; 77 `end_turn` timing differences still fail strict timing consistency. This is not a new native game or Mac GUI test and does not certify other traces. Import always reports `replayEvidence.status: not_run`.
+`--actions` counts source `action_initiated` events; `--decisions` counts imported executable commands. They differ when an explicitly adapted legacy notification belongs to its parent Proceed. The importer prints the executable input count. Import always reports `replayEvidence.status: not_run`; replay produces the comparison result.
 
 ## Use the output in your workflow
 

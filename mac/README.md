@@ -11,7 +11,7 @@ Collect human demonstrations while playing STS2 with the mouse. The recorder cap
 | Game | v0.111.0 / 41cef1ea / Steam build 24724944 |
 | Platform | macOS Apple Silicon / arm64 |
 | Gameplay | Single-player Silent A0, using your own progression |
-| Recorder package | v0.1.0-alpha; recorder revision 0.2.3 |
+| Recorder package | v0.1.3-alpha; recorder revision 0.2.4 |
 
 The [Mac manifest](config/) contains platform-specific file hashes.
 
@@ -21,7 +21,7 @@ The [Mac manifest](config/) contains platform-specific file hashes.
 
 | Item | Purpose and access |
 | --- | --- |
-| Precompiled mod | [Download Mac ZIP](https://github.com/Jtshieh/STS2-Tools/releases/download/v0.1.2-alpha/Sts2Recorder-macos-arm64-v0.1.0-alpha.zip). Install `Sts2Recorder.dll` and `Sts2Recorder.json`; retain the included license files. |
+| Precompiled mod | [Download Mac ZIP](https://github.com/Jtshieh/STS2-Tools/releases/download/v0.1.3-alpha/Sts2Recorder-macos-arm64-v0.1.3-alpha.zip). Install `Sts2Recorder.dll` and `Sts2Recorder.json`; retain the included license files. |
 | Recorder source and build script | [src/](src/) and [build.py](build.py), available in the [source ZIP](https://github.com/Jtshieh/STS2-Tools/archive/refs/heads/main.zip). Build or modify the mod locally. |
 | Workspace and export tools | [prepare.py](prepare.py), [launch.py](launch.py), and [export_trace.py](export_trace.py) create a separate game/profile workspace and organize recorded trajectories. |
 | Version configuration | [config/](config/) identifies the compatible Mac game files. |
@@ -79,6 +79,8 @@ python3 -B mac/export_trace.py \
 
 For imitation learning, pair each input's observation with its recorded choice and check delivery and successor events. Use `conversion.json` when filtering or labeling samples. A selection input and its final selection result describe different stages of the same interaction; count the input as the decision. `conversion.json` uses `sts2-gui-conversion-v2`: `structuralReady` and `issues` describe capture structure and continuity, while `requiredActionBindings` lists action-adapter reviews separately. `observationComparison.status` and `linuxReplay.status` are `not_run` at export; debug-intervention recordings use `not_applicable` for replay. Use the Linux replay result for cross-platform comparison.
 
+Recorder revision 0.2.4 records synchronous cross-act notifications as paired `engine_notification` events with a `parentActionSequence`. Execute the parent Proceed once; use the notification pair as evidence. Real nested card selections remain separate inputs. The exporter checks notification pairing and callback order.
+
 Continue with [Mac-to-Linux replay](../docs/REPLAY.md) or the [trajectory protocol](../linux/PROTOCOL.md) to build your own processing pipeline.
 
 ## Build the mod from source
@@ -91,7 +93,7 @@ python3 -B mac/build.py \
   --dotnet '/absolute/path/to/dotnet'
 ```
 
-The ZIP is written to `mac/.private/dist/Sts2Recorder-macos-arm64-v0.1.0-alpha.zip`. Install it using the steps above. The build references the game's local `sts2.dll`, `GodotSharp.dll`, and `0Harmony.dll` and packages the recorder's own assembly.
+The ZIP is written to `mac/.private/dist/Sts2Recorder-macos-arm64-v0.1.3-alpha.zip`. Install it using the steps above. The build references the game's local `sts2.dll`, `GodotSharp.dll`, and `0Harmony.dll` and packages the recorder's own assembly.
 
 ## Optional: separate game and profile workspace
 
@@ -132,7 +134,3 @@ The session exporter copies event files and metadata. Transfer `initial-profile/
 ## License
 
 [MIT](../LICENSE), with [recorder attribution](src/ATTRIBUTION.md) and [third-party notices](../NOTICE.md).
-
-### Callback metadata awaiting Mac validation
-
-The repair source uses recorder revision 0.2.4 to record synchronous cross-act notifications and their Proceed parent. `engine_notification` retains callback entry/return evidence without increasing the player-input count; real nested selections remain inputs. The v2 export report implementation is retained, with structural checks added for the new notification. Source compiles offline against pinned Linux reference assemblies. Native arm64 build and GUI validation remain required, including a cross-act Proceed, callback cleanup after failure/exit, and nested card selections. The released DLL remains 0.2.3; no asset has been republished.

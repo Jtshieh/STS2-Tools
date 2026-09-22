@@ -11,7 +11,7 @@
 | 游戏 | v0.111.0 / 41cef1ea / Steam build 24724944 |
 | 平台 | macOS Apple Silicon / arm64 |
 | 玩法 | 单人 Silent（猎手）A0，使用自己的解锁进度 |
-| 录制器包 | v0.1.0-alpha；录制器 revision 0.2.3 |
+| 录制器包 | v0.1.3-alpha；录制器 revision 0.2.4 |
 
 平台文件哈希见 [Mac 清单](config/)。
 
@@ -21,7 +21,7 @@
 
 | 内容 | 用途与获取入口 |
 | --- | --- |
-| mod 预编译包 | [下载 Mac ZIP](https://github.com/Jtshieh/STS2-Tools/releases/download/v0.1.2-alpha/Sts2Recorder-macos-arm64-v0.1.0-alpha.zip)。安装 `Sts2Recorder.dll` 和 `Sts2Recorder.json`，保留包内许可文件。 |
+| mod 预编译包 | [下载 Mac ZIP](https://github.com/Jtshieh/STS2-Tools/releases/download/v0.1.3-alpha/Sts2Recorder-macos-arm64-v0.1.3-alpha.zip)。安装 `Sts2Recorder.dll` 和 `Sts2Recorder.json`，保留包内许可文件。 |
 | 录制器源码与构建脚本 | [src/](src/) 和 [build.py](build.py)，也可从[源码 ZIP](https://github.com/Jtshieh/STS2-Tools/archive/refs/heads/main.zip) 获取，用于本地构建或修改 mod。 |
 | 工作区与导出工具 | [prepare.py](prepare.py)、[launch.py](launch.py) 和 [export_trace.py](export_trace.py)，用于创建独立游戏/profile 工作区和整理轨迹。 |
 | 版本配置 | [config/](config/) 标识兼容的 Mac 游戏文件。 |
@@ -81,6 +81,8 @@ python3 -B mac/export_trace.py \
 
 后续流程见 [Mac 到 Linux 回放](../docs/REPLAY.zh-CN.md)，自建数据处理流程可参考[轨迹协议](../linux/PROTOCOL.zh-CN.md)。
 
+录制器 revision 0.2.4 将同步跨幕通知记录为成对的 `engine_notification`，并附带 `parentActionSequence`。回放执行一次父 Proceed，通知对用作归属证据；真实嵌套选牌仍是独立输入。导出器检查通知配对及回调顺序。
+
 ## 从源码构建 mod
 
 在仓库根目录执行：
@@ -91,7 +93,7 @@ python3 -B mac/build.py \
   --dotnet '/absolute/path/to/dotnet'
 ```
 
-ZIP 输出到 `mac/.private/dist/Sts2Recorder-macos-arm64-v0.1.0-alpha.zip`，按上方步骤安装。构建引用游戏本地的 `sts2.dll`、`GodotSharp.dll` 和 `0Harmony.dll`，打包录制器自己的程序集。
+ZIP 输出到 `mac/.private/dist/Sts2Recorder-macos-arm64-v0.1.3-alpha.zip`，按上方步骤安装。构建引用游戏本地的 `sts2.dll`、`GodotSharp.dll` 和 `0Harmony.dll`，打包录制器自己的程序集。
 
 ## 可选：独立游戏与 profile 工作区
 
@@ -132,7 +134,3 @@ Continue 在 `prepare.py` 命令中增加 `--current-run '/absolute/path/to/curr
 ## 许可
 
 [MIT](../LICENSE)，[录制器归属说明](src/ATTRIBUTION.md)与[第三方归属](../NOTICE.md)。
-
-### 待 Mac 验证的回调元数据
-
-当前修复源码使用录制器 revision 0.2.4，记录 Proceed 内同步发生的跨幕通知及父动作归属。`engine_notification` 保留回调进入/返回证据，不增加玩家输入计数；真实嵌套选择仍记录为输入。v2 导出报告实现保留，仅增加新通知的结构检查。源码已用固定 Linux 参考程序集离线编译，但仍需原生 arm64 构建和实际 GUI 跨幕验证，包括正常 Proceed、回调异常/退出后归属清理及选牌嵌套输入。现有发布 DLL 仍为0.2.3；未重新发布附件。

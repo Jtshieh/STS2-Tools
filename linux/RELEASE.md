@@ -1,4 +1,4 @@
-# Linux tools v0.1.0-alpha
+# Linux tools v0.1.3-alpha
 
 The Linux component exposes the original STS2 engine to external decision and training code.
 

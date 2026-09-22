@@ -59,7 +59,8 @@ def main():
             'Drop-in mode uses the game\'s existing modded profile and saves.\n'
             'No progression is copied or unlocked by this mod. Full-run fidelity and SL unverified.\n'
             'Source and optional isolated launcher: https://github.com/Jtshieh/STS2-Tools\n')
-        archive = private / 'dist/Sts2Recorder-macos-arm64-v0.1.0-alpha.zip'
+        version = (ROOT.parent / 'VERSION').read_text().strip()
+        archive = private / 'dist' / f'Sts2Recorder-macos-arm64-v{version}.zip'
         with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as z:
             for name in ['Sts2Recorder.dll', 'Sts2Recorder.json', 'LICENSE.txt', 'RunReplays-LICENSE.txt', 'divine-sts2-LICENSE.txt', 'NOTICE.md', 'README.txt']:
                 z.write(mods / name, name)
